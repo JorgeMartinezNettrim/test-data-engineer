@@ -6,7 +6,58 @@
 <title>Test Técnico · Data Engineering</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
-<!-- ... demás estilos ... -->
+<style>
+/* ── RESET & TOKENS ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0d1117;
+  --surface:   #161b22;
+  --surface2:  #1c2230;
+  --border:    #2a3441;
+  --border2:   #374151;
+  --accent:    #2563eb;
+  --accent2:   #3b82f6;
+  --accentHi:  #60a5fa;
+  --green:     #10b981;
+  --greenDim:  #064e3b;
+  --orange:    #f59e0b;
+  --orangeDim: #451a03;
+  --red:       #ef4444;
+  --purple:    #8b5cf6;
+  --purpleDim: #2e1065;
+  --text:      #e2e8f0;
+  --textDim:   #94a3b8;
+  --textMuted: #64748b;
+  --mono:      'IBM Plex Mono', monospace;
+  --sans:      'IBM Plex Sans', sans-serif;
+  --radius:    6px;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Allow selection only inside textareas and inputs */
+textarea, input[type="text"], input[type="email"] {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* ... resto del CSS igual ... */
+</style>
+</head>
+<body>
+<!-- ... resto del HTML igual ... -->
 <script>
 // ══════════════════════════════════════════════════════════════
 // QUESTION DATA
@@ -62,6 +113,6 @@ const MC_QUESTIONS = [
   { id:'f6', block:'F', level:'Senior', q:"¿Qué implica el 'capacity throttling' en Microsoft Fabric?", opts:['El workspace se pausa automáticamente después de 8 horas','Cuando los workloads consumen muchos recursos y exceden los límites se ralentizan las operaciones y pueden pararse temporalmente','Impide crear nuevos Lakehouses','El throttling solo existe en Synapse'] },
   { id:'f7', block:'F', level:'Senior', q:'¿Cuál es la diferencia entre OneLake Data Access Roles y Workspace Roles en Fabric?', opts:['Son el mismo mecanismo con distinto nombre','Workspace Roles controlan acceso a features del entorno, OneLake Data Access autoriza acceso directo a datos','Solo existen los Data Access Roles','Solo existen los Workspace Roles'] }
 ];
-// ... más secciones igual ...
+// ... resto del script igual ...
 </script>
 <!-- ... resto igual ... -->
