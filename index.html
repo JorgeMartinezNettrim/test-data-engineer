@@ -801,23 +801,8 @@ textarea, input[type="text"], input[type="email"] {
 
     <div class="welcome-card">
       <h3>Estructura de la prueba</h3>
-      <div class="info-grid">
-        <div class="info-item">
-          <div class="label">Parte 1</div>
-          <div class="value">35 preguntas tipo test</div>
-        </div>
-        <div class="info-item">
-          <div class="label">Parte 2</div>
-          <div class="value">8 preguntas abiertas</div>
-        </div>
-        <div class="info-item">
-          <div class="label">Parte 3</div>
-          <div class="value">6 ejercicios SQL</div>
-        </div>
-        <div class="info-item">
-          <div class="label">Parte 4</div>
-          <div class="value">4 snippets Python</div>
-        </div>
+      <div class="info-grid" id="info-grid-dynamic">
+        <!-- Los totales se rellenan dinámicamente por JS -->
       </div>
       <ul class="rules-list">
         <li>Cada parte tiene su propio temporizador orientativo</li>
@@ -918,6 +903,7 @@ textarea, input[type="text"], input[type="email"] {
 </div>
 
 <script>
+
 // ══════════════════════════════════════════════════════════════
 // QUESTION DATA
 // ══════════════════════════════════════════════════════════════
@@ -955,16 +941,14 @@ const MC_QUESTIONS = [
   ], 
   correct: 1 
 },
-  { id:'b2', block:'B', level:'Junior', q:'En una arquitectura medallion (Bronze/Silver/Gold), ¿qué contiene la capa Bronze?', opts:['Datos agregados listos para consumo de negocio','Datos limpios y normalizados','Datos raw tal como llegan de la fuente, sin transformar','Modelos de Machine Learning entrenados'], correct:2 },
-  { id:'b3', block:'B', level:'Mid', q:'¿Cuál es la principal ventaja del patrón Lambda Architecture frente a procesar todo en batch?', opts:['Elimina completamente el procesamiento batch','Combina batch (alta precisión, alta latencia) con streaming (baja latencia, aproximados) para respuestas en tiempo real','Es más sencillo de implementar que un pipeline batch puro','Solo funciona con datos estructurados'], correct:1 },
+  { id:'b2', block:'B', level:'Junior', q:'En una arquitectura medallion (Bronze/Silver/Gold), ¿qué contiene la capa Bronze?', opts:['Datos agregados listos para consumo de negocio','Datos limpios y normalizados','Datos raw tal como llegan de la fuente, sin transformar','Modelos de Machine Learning entrenados'], correct:2 },  
   { id:'b4', block:'B', level:'Mid', q:"¿Qué es un 'data lakehouse' y qué problema resuelve frente al data lake tradicional?", opts:['Un data lake con más capacidad de almacenamiento','Un DWH migrado a cloud sin cambios','Arquitectura que añade ACID, schema enforcement y rendimiento analítico sobre el storage del data lake','Un sistema que reemplaza el data lake por un warehouse columnar'], correct:2 },
   { id:'b5', block:'B', level:'Senior', q:"En streaming, ¿cuál es la diferencia entre 'event time' y 'processing time'?", opts:['Son sinónimos; solo el nombre cambia según el framework','Event time es cuándo ocurrió el evento en la fuente; processing time es cuándo llega al sistema. Importa por los eventos desordenados y late data','Event time solo aplica a datos IoT','Processing time siempre es mayor que event time'], correct:1 },
   { id:'b6', block:'B', level:'Senior', q:'¿Qué garantías de consistencia ofrece Delta Lake frente a Parquet puro?', opts:['Delta ofrece mayor compresión','Delta añade ACID, time travel, schema enforcement y DML (UPDATE/DELETE/MERGE)','Parquet tiene soporte transaccional nativo; Delta solo añade índices','Delta Lake solo funciona con Spark'], correct:1 },
   // BLOQUE C — Orquestación
   { id:'c1', block:'C', level:'Junior', q:'¿Qué es un DAG en el contexto de Apache Airflow?', opts:['Una base de datos optimizada para grafos','Un Directed Acyclic Graph: define tareas de un workflow y sus dependencias sin ciclos','Un contenedor Docker para ejecutar pipelines','Un formato YAML para configurar pipelines'], correct:1 },
   { id:'c2', block:'C', level:'Junior', q:'¿Cuál describe mejor el concepto de idempotencia en un pipeline de datos?', opts:['El pipeline se ejecuta automáticamente si falla','Ejecutar el pipeline múltiples veces con el mismo input produce siempre el mismo resultado sin efectos secundarios','El pipeline procesa datos en orden estrictamente cronológico','El pipeline puede ejecutarse en paralelo sin coordinación'], correct:1 },
-  { id:'c3', block:'C', level:'Mid', q:"¿Cuál es la diferencia entre un trigger de tipo 'schedule' y uno de tipo 'sensor' en Airflow?", opts:["El schedule ejecuta en base a tiempo; el sensor espera a que una condición externa se cumpla (ej: que exista un fichero)",'El sensor es más rápido que el schedule','Son sinónimos en Airflow moderno','El sensor solo funciona con bases de datos; el schedule con ficheros'], correct:0 },
-  { id:'c4', block:'C', level:'Mid', q:'¿Qué estrategia de re-ejecución parcial permite Airflow cuando un paso intermedio falla?', opts:['Reiniciar siempre desde el primer paso','Clear y re-run de las tareas fallidas y sus descendientes, manteniendo el estado de las tareas exitosas','Airflow no soporta re-ejecución parcial','Solo se puede re-ejecutar el último paso'], correct:1 },
+  { id:'c3', block:'C', level:'Mid', q:"¿Cuál es la diferencia entre un trigger de tipo 'schedule' y uno de tipo 'sensor' en Airflow?", opts:["El schedule ejecuta en base a tiempo; el sensor espera a que una condición externa se cumpla (ej: que exista un fichero)",'El sensor es más rápido que el schedule','Son sinónimos en Airflow moderno','El sensor solo funciona con bases de datos; el schedule con ficheros'], correct:0 },  
   { id:'c5', block:'C', level:'Senior', q:'¿Cuál es la afirmación correcta sobre ELT frente a ETL en cloud data platforms?', opts:['ELT es siempre más rápido independientemente del volumen','ETL transforma antes de cargar; ELT carga en crudo y transforma dentro del warehouse aprovechando su cómputo','ELT elimina la necesidad de orquestación','ETL es la única opción válida para streaming'], correct:1 },
   { id:'c6', block:'C', level:'Senior', q:"¿Qué problema resuelve el concepto de 'backfill' en Airflow?", opts:['Llenar el storage cuando está casi lleno','Ejecutar runs de DAG para intervalos de tiempo pasados que no se procesaron en su momento','Revertir cambios en la base de datos de metadatos','Precalentar la caché de resultados'], correct:1 },
   // BLOQUE D — Cloud
@@ -990,46 +974,20 @@ const MC_QUESTIONS = [
   { id:'e2', block:'E', level:'Junior', q:'¿Qué es el linaje de datos (data lineage)?', opts:['Un log de todos los usuarios que han accedido a un dataset','El registro del origen de los datos y todas las transformaciones que han sufrido desde la fuente hasta el destino final','Un índice para acelerar consultas sobre tablas grandes','La política de retención de datos de una organización'], correct:1 },
   { id:'e3', block:'E', level:'Mid', q:'¿Qué diferencia un catálogo de datos de un diccionario de datos?', opts:['Son exactamente lo mismo con distinto nombre','El diccionario define el significado técnico de campos; el catálogo añade descubrimiento, linaje, métricas de calidad, clasificación y colaboración','El catálogo solo cubre datos estructurados','El diccionario es una funcionalidad dentro del catálogo'], correct:1 },
   
-  { 
-  id: 'e5', 
-  block: 'E', 
-  level: 'Senior', 
-  q: 'En una arquitectura Lakehouse con almacenamiento desacoplado del cómputo, ¿cuál es el principal riesgo de implementar Row-Level Security (RLS) únicamente mediante vistas en el motor de servicio (Compute Layer)?', 
-  opts: [
-    'Invalida automáticamente la caché de consultas de todas las herramientas de BI conectadas.', 
-    'Los usuarios con acceso directo de lectura al almacenamiento subyacente (Storage Layer / Data Lake) pueden saltarse las restricciones de seguridad y leer los archivos Parquet/Delta directamente.', 
-    'Fuerza al motor de almacenamiento a duplicar físicamente los archivos de datos para cada rol configurado.', 
-    'Incrementa exponencialmente el tiempo de compilación de los trabajos de streaming que escriben en el Lakehouse.'
-  ], 
-  correct: 1 
-},
   // BLOQUE F — Fabric
   { id:'f1', block:'F', level:'Junior', q:'¿Cuál es el formato de almacenamiento nativo de las tablas en un Microsoft Fabric Lakehouse?', opts:['CSV comprimido con GZIP','Apache Parquet sin gestión transaccional','Delta Lake (Delta Parquet con transaction log)','ORC (Optimized Row Columnar)'], correct:2 },
   { id:'f2', block:'F', level:'Junior', q:"¿Qué es un 'Shortcut' en Microsoft Fabric OneLake?", opts:['Un acceso directo a una dashboard de Power BI','Una referencia a datos en storage externo (S3, ADLS, GCS) que permite leerlos desde Fabric sin moverlos físicamente','Un alias para renombrar tablas dentro del Lakehouse','Un tipo de pipeline optimizado para cargas incrementales'], correct:1 },
   { id:'f3', block:'F', level:'Mid', q:'¿Cuándo es preferible usar Fabric Warehouse frente a Fabric Lakehouse?', opts:['Cuando se necesita procesar datos con PySpark o Python','Cuando el equipo usa SQL puro, necesita DML transaccional (UPDATE/DELETE), o tiene un modelo dimensional clásico tipo Kimball','Cuando los datos son semiestructurados (JSON, XML)','Cuando el volumen supera 1 TB'], correct:1 },
   { id:'f4', block:'F', level:'Mid', q:"¿Qué modo de conectividad usa Power BI en 'Direct Lake' y cuál es su principal limitación?", opts:['Lee Delta Files en OneLake sin importarlos; la limitación es el tope de filas por tabla según el SKU de capacidad, con fallback a DirectQuery','Importa datos al modelo cada hora; la limitación es la latencia','Usa DirectQuery sobre el SQL Endpoint; la limitación es el rendimiento en modelos complejos','Direct Lake no tiene limitaciones; es superior a Import Mode en todos los escenarios'], correct:0 },
   { id:'f5', block:'F', level:'Senior', q:'En Microsoft Fabric, ¿cómo se gestiona el aislamiento entre entornos (Dev/Test/Prod)?', opts:['Fabric no soporta múltiples entornos','Mediante Deployment Pipelines (Dev→Test→Prod) con integración Git y workspaces separados por entorno','Solo se puede usar un workspace por tenant de Microsoft 365','El aislamiento se gestiona exclusivamente mediante ramas de Git sin herramienta nativa'], correct:1 },  
-  { 
-  id: 'f7', 
-  block: 'F', 
-  level: 'Senior', 
-  q: '¿Cuál es el principal beneficio de aplicar V-Order a las tablas Delta dentro de un Lakehouse?', 
-  opts: [
-    'Cifra los datos en reposo automáticamente utilizando claves gestionadas por el cliente (CMK).', 
-    'Aplica una ordenación y optimización interna al formato Parquet que acelera drásticamente los tiempos de lectura para los motores de consulta SQL y Spark.', 
-    'Permite realizar operaciones de Time Travel (viaje en el tiempo) de forma nativa sin necesidad de mantener un registro de transacciones.', 
-    'Convierte automáticamente los archivos de tipo fila (Row-oriented) en archivos columnares (Columnar) en tiempo real durante la ingesta de streaming.'
-  ], 
-  correct: 1 
-},
+  
 ];
 
 const OPEN_QUESTIONS = [
-  { id:'o1', level:'Junior', title:'Optimización de una consulta SQL lenta', text:'Tienes una tabla de ventas con 50 millones de filas y una consulta SQL que tarda 2 minutos. Describe paso a paso cómo abordarías la optimización.' },
-  { id:'o2', level:'Mid', title:'Pipeline de ingesta incremental', text:'Diseña un pipeline de ingesta incremental desde una base de datos transaccional (PostgreSQL) a un Data Lake. ¿Qué estrategias usarías? ¿Cuáles son sus trade-offs ("pros y contras"?' },
-  { id:'o3', level:'Mid', title:'Troubleshooting de informe Power BI lento en Fabric', text:'Un Data Analyst te dice que su informe de Power BI tarda 30 segundos en cargar y antes tardaba 3 segundos. El entorno es Microsoft Fabric. ¿Cómo investigarías el problema y qué causas considerarías?' },  
-  { id:'o4', level:'Mid', title:'Deuda técnica en data engineering', text:'Explica qué es la deuda técnica en un contexto de data engineering. Da un ejemplo concreto de cómo se genera y cómo se aborda.' },  
-  { id:'o5', level:'Mid', title:'dbt y el patrón ELT moderno', text:'¿Qué es dbt (data build tool) y en qué se diferencia de un pipeline de transformación tradicional con Spark o SQL scripts?' },
+  { id:'o1', level:'Junior', title:'Optimización de una consulta SQL lenta', text:'Tienes una tabla de ventas con 50 millones de filas y una consulta SQL que tarda 2 minutos. Describe paso a paso cómo abordarías la optimización.' },  
+  { id:'o2', level:'Mid', title:'Gestión de incidencias en proyectos de datos', text:'Imagina que un pipeline crítico de datos falla en producción y deja de cargar información para los dashboards de negocio. ¿Cómo abordarías la investigación y resolución del problema? Explica los pasos que seguirías y cómo comunicarías la situación a los equipos afectados.' },  
+  { id:'o3', level:'Mid', title:'dbt y el patrón ELT moderno', text:'¿Qué es dbt (data build tool) y en qué se diferencia de un pipeline de transformación tradicional con Spark o SQL scripts?' },
+  { id:'o4', level:'Mid', title:'Pipeline de ingesta incremental', text:'Diseña un pipeline de ingesta incremental desde una base de datos transaccional (PostgreSQL) a un Data Lake. ¿Qué estrategias usarías? ¿Cuáles son sus trade-offs ("pros y contras"?' },  
 ];
 
 const SQL_EXERCISES = [
@@ -1387,6 +1345,33 @@ function startTest(){
   goToSection(0);
 }
 
+// ══════════════════════════════════════════════════════════════
+// ACTUALIZAR TOTALES EN WELCOME
+// ══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  const grid = document.getElementById('info-grid-dynamic');
+  if (grid) {
+    grid.innerHTML = `
+      <div class="info-item">
+        <div class="label">Parte 1</div>
+        <div class="value">${MC_QUESTIONS.length} preguntas tipo test</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Parte 2</div>
+        <div class="value">${OPEN_QUESTIONS.length} preguntas abiertas</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Parte 3</div>
+        <div class="value">${SQL_EXERCISES.length} ejercicios SQL</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Parte 4</div>
+        <div class="value">${PYTHON_EXERCISES.length} snippets Python</div>
+      </div>
+    `;
+  }
+});
+
 // ══════════════════════════════════════════════════════════════════
 // SCREENS
 // ══════════════════════════════════════════════════════════════════
@@ -1512,7 +1497,6 @@ function renderMC(container){
       <div class="mc-header">
         <span class="mc-num">${qi+1}.</span>
         <div style="flex:1">
-          <div style="margin-bottom:8px">${levelBadge(q.level)}</div>
           <div class="mc-text">${q.q}</div>
         </div>
       </div>
@@ -1560,9 +1544,6 @@ function renderOpen(container){
       <div class="open-header">
         <span class="open-num">${qi+1}.</span>
         <div class="open-content">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-            ${levelBadge(q.level)}
-          </div>
           <div class="open-title">${q.title}</div>
           <div class="open-text">${q.text}</div>
         </div>
@@ -1632,7 +1613,6 @@ lineas_pedido (linea_id INT PK, pedido_id INT FK, producto_id INT FK, cantidad I
 
     div.innerHTML = `
       <div class="exercise-header">
-        ${levelBadge(ex.level)}
         <span class="exercise-type ${typeClass}">${ex.type}</span>
         <span class="exercise-title">${ex.title}</span>
       </div>
@@ -1689,7 +1669,6 @@ function renderPython(container){
 
     div.innerHTML = `
       <div class="exercise-header">
-        ${levelBadge(ex.level)}
         <span class="exercise-type type-read">LECTURA</span>
         <span class="exercise-title">${ex.title}</span>
       </div>
