@@ -6,48 +6,62 @@
 <title>Test Técnico · Data Engineering</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
-<!-- ... estilos igual ... -->
+<!-- ... demás estilos ... -->
 <script>
 // ══════════════════════════════════════════════════════════════
 // QUESTION DATA
 // ══════════════════════════════════════════════════════════════
-
 const MC_QUESTIONS = [
   // BLOQUE A — SQL
-  // { id:'a1', block:'A', level:'Junior', q:'¿Cuál de las siguientes sentencias SQL devuelve solo las filas que tienen coincidencia en AMBAS tablas?', ... } ---- ELIMINADA
-  // { id:'a2', block:'A', level:'Junior', q:'¿Qué hace la cláusula GROUP BY en SQL?', ... } ---- ELIMINADA
-  // { id:'a3', block:'A', level:'Mid', q:'En un modelo dimensional, ¿cuál es la diferencia principal entre Star Schema y Snowflake Schema?', ... } ---- ELIMINADA
-  // Nueva 1:
   { id: 'a1b', block: 'A', level: 'Mid', q: 'Tienes una tabla de ventas con millones de registros. ¿Cuál sería la consulta SQL óptima para calcular el monto total de ventas por cliente durante el último año, incluyendo solo aquellos clientes cuyos pedidos superan los 1000€ en total?', opts: [
     'Usar GROUP BY cliente_id y un HAVING SUM(monto) > 1000, filtrando por fecha en el WHERE',
     'Agrupar por fecha y sumar los pedidos, luego filtrar clientes en el SELECT',
     'Hacer un JOIN con la tabla de clientes y filtrar en el SELECT',
     'Usar una subconsulta para traer todos los pedidos y luego agrupar'
   ] },
-  // Nueva 2:
   { id: 'a2b', block: 'A', level: 'Mid', q: 'En una base de datos analítica, necesitas calcular el ranking de ingresos por producto para cada país. ¿Qué función SQL utilizarías y cómo sería el approach?', opts: [
     'Usar la función RANK() OVER (PARTITION BY pais ORDER BY ingresos DESC)',
     'Hacer un JOIN de todas las tablas y agrupar por país y producto',
     'Utilizar la función SUM() en una subconsulta',
     'RANK() OVER (ORDER BY producto)'
   ] },
-  { id:'a4', block:'A', level:'Mid', q:'¿Qué tipo de Slowly Changing Dimension (SCD) añade una nueva fila cuando un atributo cambia, preservando el historial?', opts:['SCD Tipo 0','SCD Tipo 1','SCD...],
-  { id:'a5', block:'A', level:'Senior', q:'¿Cuál es la estrategia más eficiente para calcular totales acumulados (running totals) sobre millones de filas en un warehouse columnar?', opts:['Subconsu...],
-  { id:'a6', block:'A', level:'Senior', q:"En un data warehouse de gran volumen, ¿qué es la 'partition pruning' y cuándo ocurre?", opts:['Eliminar columnas redundantes de la tabla de hechos','E...],
+  { id:'a4', block:'A', level:'Mid', q:'¿Qué tipo de Slowly Changing Dimension (SCD) añade una nueva fila cuando un atributo cambia, preservando el historial?', opts:['SCD Tipo 0','SCD Tipo 1','SCD Tipo 2','SCD Tipo 3'] },
+  { id:'a5', block:'A', level:'Senior', q:'¿Cuál es la estrategia más eficiente para calcular totales acumulados (running totals) sobre millones de filas en un warehouse columnar?', opts:['Subconsultas correlacionadas','Ventanas analíticas (OVER/PARTITION)','Cursores','Desnormalización de la tabla de hechos'] },
+  { id:'a6', block:'A', level:'Senior', q:"En un data warehouse de gran volumen, ¿qué es la 'partition pruning' y cuándo ocurre?", opts:['Eliminar columnas redundantes de la tabla de hechos','El motor escanea solo las particiones relevantes según los filtros','Reordenar los fragmentos en el almacenamiento','Actualizar los índices secundarios antes de cada query'] },
   // BLOQUE B — Arquitecturas
-  { id:'b1', block:'B', level:'Junior', q:'¿Qué diferencia un Data Lake de un Data Warehouse?', opts:['El Data Lake solo almacena datos relacionales; el DWH acepta cualquier formato','El Data L...],
-  // ... resto igual ...
+  { id:'b1', block:'B', level:'Junior', q:'¿Qué diferencia un Data Lake de un Data Warehouse?', opts:['El Data Lake solo almacena datos relacionales; el DWH acepta cualquier formato','El Data Lake acepta todos los formatos (JSON, Parquet, CSV, binario), el DWH estructura y optimiza para analítica','El DWH siempre está en cloud, el Data Lake on-premises','No existe diferencia técnica'] },
+  { id:'b2', block:'B', level:'Junior', q:'En una arquitectura medallion (Bronze/Silver/Gold), ¿qué contiene la capa Bronze?', opts:['Datos agregados listos para consumo de negocio','Datos limpios y validados','Datos crudos, sin procesar','Datos enriquecidos por ML'] },
+  { id:'b3', block:'B', level:'Mid', q:'¿Cuál es la principal ventaja del patrón Lambda Architecture frente a procesar todo en batch?', opts:['Elimina completamente el procesamiento batch','Combina procesamiento batch y streaming para reducir latencia y ofrecer consistencia','Permite usar solo NoSQL','Es más barata en todos los casos'] },
+  { id:'b4', block:'B', level:'Mid', q:"¿Qué es un 'data lakehouse' y qué problema resuelve frente al data lake tradicional?", opts:['Un data lake con más capacidad de almacenamiento','Un DWH migrado a arquitectura cloud','Ofrece gobernanza, ACID y permite BI avanzado sobre el lago','Es solo un nombre comercial para un data lake'] },
+  { id:'b5', block:'B', level:'Senior', q:"En streaming, ¿cuál es la diferencia entre 'event time' y 'processing time'?", opts:['Son sinónimos; solo el nombre cambia según el framework','Event time refleja cuándo ocurrió el dato, processing time cuándo lo procesa el sistema','Ambos significan latencia cero','Solo aplican a bases de datos relacionales'] },
+  { id:'b6', block:'B', level:'Senior', q:'¿Qué garantías de consistencia ofrece Delta Lake frente a Parquet puro?', opts:['Delta ofrece mayor compresión','Delta añade ACID, time travel, schema evolution y transacciones, Parquet no garantiza consistencia','No hay ninguna diferencia','Parquet soporta ACID y transacciones, Delta solo parquet'] },
+  // BLOQUE C — Orquestación
+  { id:'c1', block:'C', level:'Junior', q:'¿Qué es un DAG en el contexto de Apache Airflow?', opts:['Una base de datos optimizada para grafos','Un Directed Acyclic Graph: define tareas de un workflow y su dependencia','Un algoritmo de optimización para Spark','Un tipo de tabla particionada'] },
+  { id:'c2', block:'C', level:'Junior', q:'¿Cuál describe mejor el concepto de idempotencia en un pipeline de datos?', opts:['El pipeline se ejecuta automáticamente si falla','Ejecutar el pipeline múltiples veces da el mismo resultado sin duplicar datos','Idempotencia es solo para APIs REST','Significa que el pipeline se paraleliza en clústeres'] },
+  { id:'c3', block:'C', level:'Mid', q:"¿Cuál es la diferencia entre un trigger de tipo 'schedule' y uno de tipo 'sensor' en Airflow?", opts:["El schedule ejecuta en base a tiempo; el sensor espera una condición externa","Ambos ejecutan tareas al llegar datos, pero el sensor solo detecta archivos locales","Schedule es solo para procesos ETL en cloud, sensor para batch local","No existe un trigger tipo sensor en Airflow"] },
+  { id:'c4', block:'C', level:'Mid', q:'¿Qué estrategia de re-ejecución parcial permite Airflow cuando un paso intermedio falla?', opts:['Reiniciar siempre desde el primer paso','Clear y re-run de tareas específicas','Solo reiniciar el DAG completo','No permite re-ejecución parcial'] },
+  { id:'c5', block:'C', level:'Senior', q:'¿Cuál es la afirmación correcta sobre ELT frente a ETL en cloud data platforms?', opts:['ELT es siempre más rápido independientemente del volumen','ETL transforma los datos antes de cargarlos; ELT los carga y luego transforma aprovechando el poder del warehouse','Ambos significan lo mismo','Solo ETL aprovecha recursos cloud scalable'] },
+  { id:'c6', block:'C', level:'Senior', q:"¿Qué problema resuelve el concepto de 'backfill' en Airflow?", opts:['Llenar el storage cuando está casi lleno','Ejecutar runs de DAG para intervalos de tiempo anteriores que no se ejecutaron','Hacer un backup completo del DAG','Ejecutar dos veces los mismos steps como test'] },
+  // BLOQUE D — Cloud
+  { id:'d1', block:'D', level:'Junior', q:'¿Qué tipo de almacenamiento cloud es más adecuado para un data lake con petabytes de datos históricos raramente consultados?', opts:['Almacenamiento de objetos estándar (S3 Standard, Azure Blob)', 'SSD locales en las VMs de cómputo', 'Almacenamiento en cinta', 'Almacenamiento de objetos tipo cold/infrequent access (S3 Glacier, Azure Blob Archive)'] },
+  { id:'d2', block:'D', level:'Junior', q:"¿Qué significa que un servicio cloud sea 'serverless' en data engineering?", opts:['No tiene servidor físico; los datos se almacenan en la nube de otro proveedor','No requiere provisionar ni administrar servidores. El escalado es automático y se paga solo por uso','Solo sirve para buckets de almacenamiento, nunca para procesos','Serverless significa menor rendimiento automático'] },
+  { id:'d3', block:'D', level:'Mid', q:'En AWS, ¿cuál es la diferencia entre S3 Standard, S3 Intelligent-Tiering y S3 Glacier?', opts:['Solo difieren en el límite de tamaño de objeto','Standard: acceso frecuente; Intelligent-Tiering: puede cambiar de capa; Glacier: almacenamiento frío y acceso muy lento','Standard es el más barato para históricos','Solo Standard tiene cifrado por defecto'] },
+  { id:'d4', block:'D', level:'Mid', q:"¿Qué es el 'egress cost' en cloud y por qué es relevante en arquitecturas multi-cloud?", opts:['El coste de ingestar datos desde fuentes externas','El coste de transferir datos fuera del cloud (saliente) puede ser muy alto y afecta la interoperabilidad','Es el coste de refrescar dashboards en Power BI','No existen costes por egress en cloud público'] },
+  { id:'d5', block:'D', level:'Senior', q:'En Kubernetes (EKS/AKS/GKE), ¿cuál es la ventaja de Karpenter frente al Cluster Autoscaler clásico?', opts:['Karpenter solo funciona en AWS','Karpenter provisiona nodos mucho más rápido y eficiente usando eventos y permite scaling más granular','El autoscaler solo escala horizontal, Karpenter vertical','Ambos son exactamente iguales en coste y rapidez'] },
   // BLOQUE E — Calidad
-  { id:'e1', block:'E', level:'Junior', q:'¿Cuál de estas métricas NO es una dimensión estándar de calidad de datos?', opts:['Completitud (no hay valores nulos inesperados)','Unicidad (no ha...],
-  { id:'e2', block:'E', level:'Junior', q:'¿Qué es el linaje de datos (data lineage)?', opts:['Un log de todos los usuarios que han accedido a un dataset','El registro del origen de los datos y ...],
-  { id:'e3', block:'E', level:'Mid', q:'¿Qué diferencia un catálogo de datos de un diccionario de datos?', opts:['Son exactamente lo mismo con distinto nombre','El diccionario define el signif...],
-  // { id:'e4', block:'E', level:'Mid', q:"En el contexto del RGPD, ¿qué implica el derecho al olvido para un data engineer?", ... } ---- ELIMINADA
-  { id:'e5', block:'E', level:'Senior', q:'¿Cuál es el principal riesgo de implementar RLS solo en la capa de reporting (Power BI, Tableau) en lugar de en la capa de datos?', opts:['El RLS en report...],
+  { id:'e1', block:'E', level:'Junior', q:'¿Cuál de estas métricas NO es una dimensión estándar de calidad de datos?', opts:['Completitud (no hay valores nulos inesperados)','Unicidad (no hay duplicados donde no debería)','Velocidad','Consistencia'] },
+  { id:'e2', block:'E', level:'Junior', q:'¿Qué es el linaje de datos (data lineage)?', opts:['Un log de todos los usuarios que han accedido a un dataset','El registro del origen de los datos y todas las transformaciones/aplicaciones/consumos que han sufrido','La gobernanza de usuarios sobre los datos','El usuario que más datos consulta'] },
+  { id:'e3', block:'E', level:'Mid', q:'¿Qué diferencia un catálogo de datos de un diccionario de datos?', opts:['Son exactamente lo mismo con distinto nombre','El diccionario define el significado y tipos de datos; el catálogo agrega su linaje, calidad, propietarios y relaciones','El catálogo solo existe en la nube, el diccionario en on-premise','El diccionario se usa solo en SQL'] },
+  { id:'e5', block:'E', level:'Senior', q:'¿Cuál es el principal riesgo de implementar RLS solo en la capa de reporting (Power BI, Tableau) en lugar de en la capa de datos?', opts:['El RLS en reporting es suficiente','Un usuario puede acceder a datos restringidos usando otros orígenes saltándose la protección','El RLS bloquea también el acceso de los administradores','No hay diferencia relevante entre las capas'] },
   // BLOQUE F — Fabric
-  { id:'f1', block:'F', level:'Junior', q:'¿Cuál es el formato de almacenamiento nativo de las tablas en un Microsoft Fabric Lakehouse?', opts:['CSV comprimido con GZIP','Apache Parquet s...],
-  // ... resto igual ...
+  { id:'f1', block:'F', level:'Junior', q:'¿Cuál es el formato de almacenamiento nativo de las tablas en un Microsoft Fabric Lakehouse?', opts:['CSV comprimido con GZIP','Apache Parquet sin gestión transaccional','Delta Lake (Parquet + transacciones)','JSON Lines'] },
+  { id:'f2', block:'F', level:'Junior', q:"¿Qué es un 'Shortcut' en Microsoft Fabric OneLake?", opts:['Un acceso directo a una dashboard de Power BI','Una referencia a datos en storage externo (S3, Lakehouse, otros workspaces)','Un conector para APIs REST','Cualquier base de datos relacional abierta'] },
+  { id:'f3', block:'F', level:'Mid', q:'¿Cuándo es preferible usar Fabric Warehouse frente a Fabric Lakehouse?', opts:['Cuando se necesita procesar datos con PySpark o Python','Cuando el equipo usa principalmente SQL y requiere features DWH','Solo si el tamaño es <100GB','Warehouse solo sirve para informes, Lakehouse para ML'] },
+  { id:'f4', block:'F', level:'Mid', q:"¿Qué modo de conectividad usa Power BI en 'Direct Lake' y cuál es su principal limitación?", opts:['Lee Delta Files en OneLake sin importarlos; la limitación es que no soporta por ahora features avanzados como Security RLS ni reporting composite','Siempre importa los datos, nunca accede en tiempo real','Direct Lake es solo para datos internos, nunca para externos','Direct Lake utiliza tablas JSON internas'] },
+  { id:'f5', block:'F', level:'Senior', q:'En Microsoft Fabric, ¿cómo se gestiona el aislamiento entre entornos (Dev/Test/Prod)?', opts:['Fabric no soporta múltiples entornos','Mediante Deployment Pipelines y promoción entre stages','Solo con workspaces independientes','No hay ningún mecanismo soportado por plataforma'] },
+  { id:'f6', block:'F', level:'Senior', q:"¿Qué implica el 'capacity throttling' en Microsoft Fabric?", opts:['El workspace se pausa automáticamente después de 8 horas','Cuando los workloads consumen muchos recursos y exceden los límites se ralentizan las operaciones y pueden pararse temporalmente','Impide crear nuevos Lakehouses','El throttling solo existe en Synapse'] },
+  { id:'f7', block:'F', level:'Senior', q:'¿Cuál es la diferencia entre OneLake Data Access Roles y Workspace Roles en Fabric?', opts:['Son el mismo mecanismo con distinto nombre','Workspace Roles controlan acceso a features del entorno, OneLake Data Access autoriza acceso directo a datos','Solo existen los Data Access Roles','Solo existen los Workspace Roles'] }
 ];
-
-// ... resto igual ...
+// ... más secciones igual ...
 </script>
 <!-- ... resto igual ... -->
