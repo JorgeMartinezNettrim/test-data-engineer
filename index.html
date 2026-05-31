@@ -857,6 +857,9 @@ textarea, input[type="text"], input[type="email"] {
   <div style="width:100%;max-width:520px">
     <h2>Revisar y enviar</h2>
     <p>Comprueba el resumen antes de enviar. Una vez enviado no podrás modificar las respuestas.</p>
+    <p style="color:var(--orange);font-size:13px;margin:0 auto 20px;max-width:480px">
+      Importante: descarga el PDF de backup al terminar la prueba y guárdalo como respaldo de tus respuestas.
+    </p>
     <div class="submit-card">
       <h3>Resumen de respuestas</h3>
       <div class="submit-stat">
@@ -987,7 +990,7 @@ const OPEN_QUESTIONS = [
   { id:'o1', level:'Junior', title:'Optimización de una consulta SQL lenta', text:'Tienes una tabla de ventas con 50 millones de filas y una consulta SQL que tarda 2 minutos. Describe paso a paso cómo abordarías la optimización.' },  
   { id:'o2', level:'Mid', title:'Gestión de incidencias en proyectos de datos', text:'Imagina que un pipeline crítico de datos falla en producción y deja de cargar información para los dashboards de negocio. ¿Cómo abordarías la investigación y resolución del problema? Explica los pasos que seguirías y cómo comunicarías la situación a los equipos afectados.' },  
   { id:'o3', level:'Mid', title:'dbt y el patrón ELT moderno', text:'¿Qué es dbt (data build tool) y en qué se diferencia de un pipeline de transformación tradicional con Spark o SQL scripts?' },
-  { id:'o4', level:'Mid', title:'Pipeline de ingesta incremental', text:'Diseña un pipeline de ingesta incremental desde una base de datos transaccional (PostgreSQL) a un Data Lake. ¿Qué estrategias usarías? ¿Cuáles son sus trade-offs ("pros y contras"?' },  
+  { id:'o4', level:'Mid', title:'Pipeline de ingesta incremental', text:'Diseña un pipeline de ingesta incremental desde una base de datos transaccional (PostgreSQL) a un Data Lake. ¿Qué estrategias usarías? ' },  
 ];
 
 const SQL_EXERCISES = [
@@ -1094,174 +1097,110 @@ WHERE p.estado != 'cancelado';`,
 
 const PYTHON_EXERCISES = [
   {
-    id:'p1', level:'Junior', title:'Carga y transformación básica con pandas',
-    prompt:'Explica qué hace este script paso a paso. ¿Hay algún problema potencial si se usa en producción?',
+    id:'p1', level:'Junior', title:'¿Qué hace esta función?',
+    prompt:'Lee el siguiente código y explica qué hace paso a paso. ¿Hay algo que mejorarías?',
     code:`import pandas as pd
 
-def procesar_pedidos(ruta_fichero: str) -> pd.DataFrame:
-    df = pd.read_csv(ruta_fichero)
+def resumen_ventas(ruta: str) -> pd.DataFrame:
+    df = pd.read_csv(ruta)
 
-    df['fecha']   = pd.to_datetime(df['fecha'])
     df['importe'] = df['cantidad'] * df['precio_unitario']
 
-    df = df[df['estado'] != 'cancelado']
+    df = df[df['importe'] > 0]
 
-    resumen = df.groupby('cliente_id').agg(
-        total_pedidos  = ('pedido_id', 'nunique'),
-        importe_total  = ('importe',   'sum'),
-        primera_compra = ('fecha',     'min'),
-        ultima_compra  = ('fecha',     'max'),
+    resultado = df.groupby('categoria').agg(
+        total_ventas = ('importe', 'sum'),
+        num_pedidos  = ('pedido_id', 'count'),
     ).reset_index()
 
-    resumen['ticket_medio'] = (
-        resumen['importe_total'] / resumen['total_pedidos']
+    resultado['ticket_medio'] = (
+        resultado['total_ventas'] / resultado['num_pedidos']
     )
 
-    return resumen.sort_values('importe_total', ascending=False)`,
+    return resultado.sort_values('total_ventas', ascending=False)`,
     answers:[
-      { label:'¿Qué hace? Explica cada bloque', placeholder:'Explica paso a paso qué hace cada parte del código.', rows:6, mono:false },
-      { label:'Problemas en producción y mejoras', placeholder:'¿Qué fallaría en producción? ¿Qué cambiarías?', rows:5, mono:false },
+      { label:'¿Qué hace? Explica cada paso', placeholder:'Explica con tus palabras qué hace cada bloque del código.', rows:6, mono:false },
+      { label:'¿Qué mejorarías?', placeholder:'¿Qué pasaría si el fichero no existe? ¿Y si hay valores nulos en cantidad o precio_unitario?', rows:4, mono:false },
     ]
   },
   {
-    id:'p2', level:'Mid', title:'Ingesta incremental basada en watermark',
-    prompt:'¿Qué hace esta función? ¿Qué problemas tiene para usarla en producción? Presta especial atención a la línea marcada con el comentario.',
+    id:'p2', level:'Junior', title:'Encuentra el bug',
+    prompt:'Esta función debería devolver los clientes con más de N pedidos, pero devuelve resultados incorrectos. ¿Dónde está el problema?',
     code:`import pandas as pd
-import logging
-from pathlib import Path
-from datetime import datetime
 
-logger = logging.getLogger(__name__)
+def clientes_frecuentes(df: pd.DataFrame, minimo: int) -> pd.DataFrame:
 
-def ingestar_incremental(
-    origen: str,
-    destino: str,
-    watermark_col: str = 'updated_at',
-    ultimo_proceso: datetime | None = None,
-) -> dict:
+    conteo = df.groupby('cliente_id')['pedido_id'].count()
 
-    df = pd.read_parquet(origen)
+    clientes = conteo[conteo > minimo]
 
-    if ultimo_proceso is not None:
-        df = df[df[watermark_col] > ultimo_proceso]
+    resultado = df[df['cliente_id'].isin(clientes)]
 
-    if df.empty:
-        logger.info('Sin registros nuevos desde %s', ultimo_proceso)
-        return {'registros': 0, 'status': 'skipped'}
-
-    ruta = Path(destino)
-    modo = 'a' if ruta.exists() else 'w'   # <-- ojo aquí
-
-    df.to_parquet(destino, engine='pyarrow', index=False)
-
-    nuevo_watermark = df[watermark_col].max()
-    logger.info('Procesados %d registros. Nuevo watermark: %s',
-                len(df), nuevo_watermark)
-
-    return {'registros': len(df), 'watermark': nuevo_watermark, 'status': 'ok'}`,
+    return resultado.drop_duplicates('cliente_id')[['cliente_id', 'nombre']]`,
     answers:[
-      { label:'¿Qué hace? ¿Qué patrón implementa?', placeholder:'Explica el propósito de la función y el patrón de diseño utilizado.', rows:5, mono:false },
-      { label:'Problemas identificados y mejoras', placeholder:'¿Qué problemas tiene? Especialmente, ¿qué ocurre con la línea marcada?', rows:6, mono:false },
+      { label:'¿Dónde está el bug y por qué?', placeholder:'Explica qué devuelve realmente la función y en qué caso falla.', rows:5, mono:false },
+      { label:'¿Cómo lo corregirías?', placeholder:'Escribe la corrección o explícala con palabras.', rows:4, mono:false },
     ]
   },
   {
-    id:'p3', level:'Mid', title:'Validación de calidad de datos con dataclass',
-    prompt:'¿Qué hace este módulo? ¿Es suficiente para un entorno de producción real? ¿Qué validaciones añadirías?',
-    code:`from dataclasses import dataclass, field
-import pandas as pd
-
-@dataclass
-class ResultadoValidacion:
-    valido: bool = True
-    errores: list[str] = field(default_factory=list)
-
-    def fallo(self, msg: str):
-        self.valido = False
-        self.errores.append(msg)
-
-
-def validar_pedidos(df: pd.DataFrame) -> ResultadoValidacion:
-    r = ResultadoValidacion()
-
-    # 1. Columnas obligatorias
-    requeridas = {'pedido_id', 'cliente_id', 'fecha', 'estado', 'importe'}
-    faltantes  = requeridas - set(df.columns)
-    if faltantes:
-        r.fallo(f'Columnas faltantes: {faltantes}')
-        return r
-
-    # 2. Nulos en columnas críticas
-    for col in ['pedido_id', 'cliente_id', 'fecha']:
-        n = df[col].isna().sum()
-        if n > 0:
-            r.fallo(f'{col}: {n} valores nulos')
-
-    # 3. Importes negativos
-    if (df['importe'] < 0).sum() > 0:
-        r.fallo(f"importe: {(df['importe'] < 0).sum()} valores negativos")
-
-    # 4. Estados válidos
-    estados_ok = {'pendiente', 'completado', 'cancelado', 'devuelto'}
-    invalidos  = ~df['estado'].isin(estados_ok)
-    if invalidos.any():
-        r.fallo(f"estados inválidos: {df.loc[invalidos,'estado'].unique().tolist()}")
-
-    # 5. Duplicados en PK
-    dupes = df['pedido_id'].duplicated().sum()
-    if dupes > 0:
-        r.fallo(f'pedido_id: {dupes} duplicados')
-
-    return r`,
-    answers:[
-      { label:'¿Qué hace? Describe el patrón de diseño', placeholder:'Explica la lógica y por qué se acumulan los errores en lugar de lanzar excepción al primer fallo.', rows:5, mono:false },
-      { label:'¿Es suficiente para producción? ¿Qué añadirías?', placeholder:'¿Qué validaciones faltan? ¿Cambiarías algo del diseño?', rows:6, mono:false },
-    ]
-  },
-  {
-    id:'p4', level:'Senior', title:'Procesamiento paralelo con chunks',
-    prompt:'Explica el patrón de diseño, sus ventajas y sus riesgos. ¿Qué cambiarías para un entorno de producción con ficheros de varios GB?',
+    id:'p3', level:'Mid', title:'¿Qué problema tiene este pipeline?',
+    prompt:'Este código funciona con datos de prueba pero falla en producción con ficheros grandes. ¿Por qué? ¿Cómo lo arreglarías?',
     code:`import pandas as pd
-from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Callable
-import logging
 
-logger = logging.getLogger(__name__)
+def procesar_pedidos(ruta: str) -> pd.DataFrame:
 
-def procesar_en_chunks(
-    ruta: Path,
-    transform_fn: Callable[[pd.DataFrame], pd.DataFrame],
-    chunk_size: int = 100_000,
-    max_workers: int = 4,
-) -> pd.DataFrame:
+    df = pd.read_csv(ruta)
 
-    reader     = pd.read_csv(ruta, chunksize=chunk_size)
-    resultados = []
+    resultado = pd.DataFrame()
+    for _, fila in df.iterrows():
+        enriquecida = pd.DataFrame([{
+            'pedido_id': fila['pedido_id'],
+            'cliente':   fila['cliente_id'],
+            'importe':   fila['cantidad'] * fila['precio_unitario'],
+            'iva':       fila['cantidad'] * fila['precio_unitario'] * 0.21,
+        }])
+        resultado = pd.concat([resultado, enriquecida])
 
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futuros = {
-            executor.submit(transform_fn, chunk): i
-            for i, chunk in enumerate(reader)
-        }
-        for futuro in as_completed(futuros):
-            idx = futuros[futuro]
-            try:
-                resultado = futuro.result()
-                resultados.append(resultado)
-            except Exception as e:
-                logger.error('Error en chunk %d: %s', idx, e)
-
-    if not resultados:
-        return pd.DataFrame()
-
-    return pd.concat(resultados, ignore_index=True)`,
+    return resultado.reset_index(drop=True)`,
     answers:[
-      { label:'Patrón implementado y ventajas', placeholder:'¿Qué patrón de diseño se usa? ¿Qué ventajas ofrece?', rows:5, mono:false },
-      { label:'Riesgos y mejoras para producción', placeholder:'¿Qué riesgos tiene con ficheros grandes? ¿ThreadPoolExecutor es la elección correcta aquí?', rows:7, mono:false },
+      { label:'¿Por qué falla con ficheros grandes?', placeholder:'Identifica los problemas de rendimiento. ¿Qué ocurre en memoria con cada iteración?', rows:5, mono:false },
+      { label:'¿Cómo lo reescribirías?', placeholder:'No hace falta código exacto. Explica cómo lo harías de forma eficiente.', rows:5, mono:false },
+    ]
+  },
+  {
+    id:'p4', level:'Mid', title:'Transformación con PySpark',
+    prompt:'Explica qué hace este código. ¿Hay algo que te llame la atención en términos de rendimiento?',
+    code:`from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+def ventas_por_cliente(ruta_entrada: str, ruta_salida: str) -> None:
+
+    spark = SparkSession.builder \\
+        .appName("ventas_por_cliente") \\
+        .getOrCreate()
+
+    df = spark.read.parquet(ruta_entrada)
+
+    df = df.filter(F.col('estado') != 'cancelado')
+
+    resultado = df.groupBy('cliente_id').agg(
+        F.sum(F.col('cantidad') * F.col('precio_unitario')).alias('importe_total'),
+        F.count('pedido_id').alias('num_pedidos'),
+    )
+
+    resultado \\
+        .orderBy(F.col('importe_total').desc()) \\
+        .write \\
+        .mode('overwrite') \\
+        .parquet(ruta_salida)
+
+    spark.stop()`,
+    answers:[
+      { label:'¿Qué hace? Explica cada bloque', placeholder:'Explica qué hace cada parte del código.', rows:5, mono:false },
+      { label:'¿Detectas algún problema de rendimiento?', placeholder:'¿Hay alguna operación que podría ser costosa con millones de filas?', rows:5, mono:false },
     ]
   },
 ];
-
 // ══════════════════════════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════════════════════════
@@ -1811,7 +1750,6 @@ function downloadBackupPdf(){
   addWrappedText(doc, 'Email: ' + payload.candidate.email, margin, maxWidth, y, lineHeight);
   addWrappedText(doc, 'Experiencia: ' + payload.candidate.exp, margin, maxWidth, y, lineHeight);
   addWrappedText(doc, 'Fecha: ' + payload.submittedAt, margin, maxWidth, y, lineHeight);
-  addWrappedText(doc, 'Puntuacion test: ' + payload.mcScore, margin, maxWidth, y, lineHeight);
   addWrappedText(doc, 'Cambios de pestana: ' + payload.tabSwitches, margin, maxWidth, y, lineHeight);
   y.value += 8;
 
