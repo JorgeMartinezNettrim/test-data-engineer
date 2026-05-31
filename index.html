@@ -53,66 +53,1770 @@ textarea, input[type="text"], input[type="email"] {
   -webkit-user-select: text;
 }
 
-/* ... resto del CSS igual ... */
+/* ── LAYOUT ─────────────────────────────────────────────────── */
+#app { min-height: 100vh; }
+
+.screen {
+  display: none;
+  min-height: 100vh;
+}
+.screen.active { display: flex; }
+
+/* ── HEADER BAR ─────────────────────────────────────────────── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 52px;
+  background: rgba(13,17,23,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-logo {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accentHi);
+  letter-spacing: 0.05em;
+}
+.topbar-sep { color: var(--border2); font-size: 18px; }
+.topbar-candidate {
+  font-size: 13px;
+  color: var(--textDim);
+  font-family: var(--mono);
+}
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+
+/* ── TIMER ──────────────────────────────────────────────────── */
+.timer {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text);
+  letter-spacing: 0.08em;
+  transition: all 0.3s;
+}
+.timer.warn { border-color: var(--orange); color: var(--orange); background: var(--orangeDim); }
+.timer.danger { border-color: var(--red); color: var(--red); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+
+/* ── PROGRESS ───────────────────────────────────────────────── */
+.progress-bar {
+  height: 3px;
+  background: var(--border);
+  position: fixed; top: 52px; left: 0; right: 0; z-index: 99;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accentHi));
+  transition: width 0.4s ease;
+  box-shadow: 0 0 8px var(--accent);
+}
+
+/* ── SECTION PILL ───────────────────────────────────────────── */
+.section-pill {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+.pill-test   { color: var(--accentHi); border-color: var(--accent); background: rgba(37,99,235,0.1); }
+.pill-open   { color: var(--green);    border-color: var(--green);  background: rgba(16,185,129,0.1); }
+.pill-sql    { color: var(--orange);   border-color: var(--orange); background: rgba(245,158,11,0.1); }
+.pill-python { color: var(--purple);   border-color: var(--purple); background: rgba(139,92,246,0.1); }
+
+/* ── LEVEL BADGE ────────────────────────────────────────────── */
+.badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.badge-junior { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+.badge-mid    { background: rgba(37,99,235,0.15);  color: #60a5fa; border: 1px solid rgba(37,99,235,0.3); }
+.badge-senior { background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }
+
+/* ── WELCOME SCREEN ─────────────────────────────────────────── */
+#screen-welcome {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(37,99,235,0.08) 0%, transparent 70%);
+}
+.welcome-logo {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--accentHi);
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+.welcome-title {
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 300;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+.welcome-title strong { font-weight: 600; color: var(--accentHi); }
+.welcome-subtitle {
+  font-size: 15px;
+  color: var(--textDim);
+  text-align: center;
+  margin-bottom: 48px;
+}
+.welcome-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  width: 100%;
+  max-width: 520px;
+  margin-bottom: 32px;
+}
+.welcome-card h3 {
+  font-size: 13px;
+  font-family: var(--mono);
+  color: var(--textDim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.info-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.info-item .label {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--textMuted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+.info-item .value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+.rules-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rules-list li {
+  font-size: 13px;
+  color: var(--textDim);
+  padding-left: 20px;
+  position: relative;
+}
+.rules-list li::before {
+  content: "→";
+  position: absolute; left: 0;
+  color: var(--accentHi);
+  font-family: var(--mono);
+}
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 520px;
+  margin-bottom: 24px;
+}
+.field-group label {
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--textDim);
+  letter-spacing: 0.06em;
+}
+.field-group input {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  padding: 12px 16px;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.field-group input:focus { border-color: var(--accent); }
+
+/* ── BUTTONS ────────────────────────────────────────────────── */
+.btn {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 28px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.01em;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-outline {
+  background: transparent;
+  color: var(--textDim);
+  border: 1px solid var(--border2);
+}
+.btn-outline:hover { border-color: var(--accent); color: var(--accentHi); }
+.btn-lg { padding: 14px 36px; font-size: 15px; }
+
+/* ── MAIN TEST LAYOUT ───────────────────────────────────────── */
+#screen-test {
+  flex-direction: column;
+  padding-top: 71px; /* topbar + progress */
+}
+.test-body {
+  display: flex;
+  flex: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 24px 80px;
+}
+.test-main { flex: 1; padding: 32px 0; }
+
+/* ── SECTION INTRO ──────────────────────────────────────────── */
+.section-intro {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.section-intro-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.section-intro h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.section-intro p {
+  font-size: 14px;
+  color: var(--textDim);
+  max-width: 600px;
+}
+
+/* ── QUESTION COUNTER ───────────────────────────────────────── */
+.q-counter {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--textMuted);
+  margin-bottom: 24px;
+  letter-spacing: 0.06em;
+}
+
+/* ── MC QUESTION ────────────────────────────────────────────── */
+.mc-question {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.mc-question.answered { border-color: var(--border2); }
+.mc-header {
+  padding: 16px 20px 14px;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.mc-num {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--textMuted);
+  min-width: 28px;
+  padding-top: 2px;
+}
+.mc-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+  flex: 1;
+}
+.mc-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border-top: 1px solid var(--border);
+}
+.mc-option {
+  background: var(--surface);
+  padding: 11px 16px;
+  cursor: pointer;
+  display: flex; align-items: flex-start; gap: 10px;
+  transition: background 0.15s;
+  position: relative;
+}
+.mc-option:hover { background: var(--surface2); }
+.mc-option.selected {
+  background: rgba(37,99,235,0.15);
+  border: none;
+}
+.mc-option.selected::after {
+  content: '';
+  position: absolute; inset: 0;
+  border: 1px solid var(--accent);
+  border-radius: 0;
+  pointer-events: none;
+}
+.opt-letter {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--textMuted);
+  min-width: 18px;
+  padding-top: 2px;
+}
+.mc-option.selected .opt-letter { color: var(--accentHi); }
+.opt-text {
+  font-size: 13px;
+  color: var(--textDim);
+  line-height: 1.5;
+}
+.mc-option.selected .opt-text { color: var(--text); }
+
+/* ── OPEN QUESTION ──────────────────────────────────────────── */
+.open-question {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.open-header {
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.open-num {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--textMuted);
+  min-width: 32px;
+  padding-top: 2px;
+}
+.open-content { flex: 1; }
+.open-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.open-text {
+  font-size: 13px;
+  color: var(--textDim);
+  line-height: 1.6;
+}
+.open-answer {
+  padding: 16px 20px;
+}
+.open-answer textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 12px 14px;
+  resize: vertical;
+  min-height: 120px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.open-answer textarea:focus { border-color: var(--accent); }
+.char-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--textMuted);
+  text-align: right;
+  margin-top: 6px;
+}
+
+/* ── CODE BLOCK ─────────────────────────────────────────────── */
+.code-block {
+  background: #0a0e13;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 12px 0;
+  overflow-x: auto;
+}
+.code-block pre {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  padding: 16px 20px;
+  color: #abb2bf;
+  white-space: pre;
+}
+.code-block .c { color: #5c6370; font-style: italic; } /* comments */
+.code-block .k { color: #c678dd; }  /* keywords */
+.code-block .s { color: #98c379; }  /* strings */
+.code-block .f { color: #61afef; }  /* functions */
+.code-block .n { color: #e06c75; }  /* names */
+.code-block .p { color: #d19a66; }  /* numbers/punctuation */
+
+.code-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--textMuted);
+  padding: 8px 16px 0;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+/* ── SQL/PYTHON EXERCISE ────────────────────────────────────── */
+.exercise {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+.exercise-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.exercise-type {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.type-read   { background: rgba(37,99,235,0.2);  color: #60a5fa; }
+.type-fix    { background: rgba(245,158,11,0.2); color: #fbbf24; }
+.type-write  { background: rgba(16,185,129,0.2); color: #34d399; }
+.exercise-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+}
+.exercise-body { padding: 16px 20px; }
+.exercise-prompt {
+  font-size: 13px;
+  color: var(--textDim);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.exercise-hint {
+  font-size: 12px;
+  color: var(--textMuted);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  font-style: italic;
+}
+.answer-section { margin-top: 14px; }
+.answer-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--textMuted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.answer-section textarea {
+  width: 100%;
+  background: #0a0e13;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: #abb2bf;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  padding: 14px 16px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.answer-section textarea:focus { border-color: var(--accent); }
+.answer-section textarea.prose {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* ── MULTI-ANSWER (for SQL exercises with multiple parts) ───── */
+.sub-answer { margin-bottom: 12px; }
+.sub-answer-label {
+  font-size: 12px;
+  color: var(--textDim);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+/* ── NAVIGATION ─────────────────────────────────────────────── */
+.nav-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(13,17,23,0.97);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex; justify-content: space-between; align-items: center;
+  z-index: 90;
+}
+.nav-info {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--textMuted);
+}
+.nav-actions { display: flex; gap: 10px; }
+
+/* ── WARNING TOAST ──────────────────────────────────────────── */
+.toast {
+  position: fixed; top: 70px; right: 20px; z-index: 200;
+  background: var(--orangeDim);
+  border: 1px solid var(--orange);
+  border-radius: var(--radius);
+  padding: 12px 18px;
+  font-size: 13px;
+  color: var(--orange);
+  font-family: var(--mono);
+  transform: translateX(120%);
+  transition: transform 0.3s ease;
+  max-width: 320px;
+}
+.toast.show { transform: translateX(0); }
+
+/* ── SUBMIT SCREEN ──────────────────────────────────────────── */
+#screen-submit {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+}
+#screen-submit h2 {
+  font-size: 28px;
+  font-weight: 300;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+#screen-submit p {
+  color: var(--textDim);
+  max-width: 480px;
+  margin: 0 auto 32px;
+  font-size: 14px;
+}
+.submit-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 32px;
+  max-width: 500px;
+  width: 100%;
+  margin-bottom: 24px;
+  text-align: left;
+}
+.submit-card h3 {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--textMuted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.submit-stat {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.submit-stat:last-child { border-bottom: none; }
+.submit-stat .label { color: var(--textDim); }
+.submit-stat .value {
+  font-family: var(--mono);
+  color: var(--accentHi);
+  font-weight: 600;
+}
+.success-icon {
+  width: 64px; height: 64px;
+  background: rgba(16,185,129,0.1);
+  border: 2px solid var(--green);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 24px;
+  font-size: 28px;
+}
+
+/* ── DONE SCREEN ────────────────────────────────────────────── */
+#screen-done {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+/* ── SECTION OVERVIEW DOTS ──────────────────────────────────── */
+.section-dots {
+  display: flex; gap: 6px; align-items: center;
+}
+.dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--border2);
+  transition: all 0.3s;
+}
+.dot.active { background: var(--accentHi); box-shadow: 0 0 6px var(--accentHi); }
+.dot.done { background: var(--green); }
+
+/* ── SCHEMA BOX ─────────────────────────────────────────────── */
+.schema-box {
+  background: #0a0e13;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--orange);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 24px;
+}
+.schema-box .schema-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 10px;
+}
+.schema-box pre {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: #abb2bf;
+  line-height: 1.6;
+}
+.schema-box pre .c { color: #5c6370; }
+
+/* ── SCROLLBAR ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ── TABS ───────────────────────────────────────────────────── */
+.answer-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border); }
+.answer-tab {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  padding: 8px 16px;
+  cursor: pointer;
+  color: var(--textMuted);
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+.answer-tab:hover { color: var(--textDim); }
+.answer-tab.active { color: var(--accentHi); border-bottom-color: var(--accentHi); }
+
+/* mobile */
+@media (max-width: 600px) {
+  .mc-options { grid-template-columns: 1fr; }
+  .info-grid { grid-template-columns: 1fr; }
+  .test-body { padding: 0 16px 80px; }
+}
 </style>
 </head>
 <body>
-<!-- ... resto del HTML igual ... -->
+
+<!-- ── TOP BAR ────────────────────────────────────────────────── -->
+<div class="topbar" id="topbar" style="display:none">
+  <div class="topbar-left">
+    <span class="topbar-logo">DE·TEST</span>
+    <span class="topbar-sep">|</span>
+    <span class="topbar-candidate" id="topbar-name">—</span>
+  </div>
+  <div class="topbar-right">
+    <div class="section-dots" id="section-dots">
+      <div class="dot" id="dot-0"></div>
+      <div class="dot" id="dot-1"></div>
+      <div class="dot" id="dot-2"></div>
+      <div class="dot" id="dot-3"></div>
+    </div>
+    <div class="timer" id="timer">00:00</div>
+  </div>
+</div>
+<div class="progress-bar" id="progress-bar" style="display:none">
+  <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+</div>
+
+<!-- ── TOAST ──────────────────────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WELCOME SCREEN
+════════════════════════════════════════════════════════════════ -->
+<div class="screen active" id="screen-welcome">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;padding:48px 24px;background:radial-gradient(ellipse at 50% 0%,rgba(37,99,235,0.06) 0%,transparent 70%)">
+    <div class="welcome-logo">Data Engineering · Technical Assessment</div>
+    <h1 class="welcome-title">Test Técnico<br><strong>Data Engineering</strong></h1>
+    <p class="welcome-subtitle">Microsoft Fabric · SQL · Python · Arquitecturas</p>
+
+    <div class="welcome-card">
+      <h3>Estructura de la prueba</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="label">Parte 1</div>
+          <div class="value">35 preguntas tipo test</div>
+        </div>
+        <div class="info-item">
+          <div class="label">Parte 2</div>
+          <div class="value">8 preguntas abiertas</div>
+        </div>
+        <div class="info-item">
+          <div class="label">Parte 3</div>
+          <div class="value">6 ejercicios SQL</div>
+        </div>
+        <div class="info-item">
+          <div class="label">Parte 4</div>
+          <div class="value">4 snippets Python</div>
+        </div>
+      </div>
+      <ul class="rules-list">
+        <li>Cada parte tiene su propio temporizador orientativo</li>
+        <li>No hay penalización por respuestas incorrectas en el test</li>
+        <li>Responde con claridad; se valora el razonamiento</li>
+        <li>No se permite copiar texto de la pantalla</li>
+        <li>Las respuestas se envían automáticamente al finalizar</li>
+      </ul>
+    </div>
+
+    <div class="field-group">
+      <label>NOMBRE COMPLETO</label>
+      <input type="text" id="input-name" placeholder="Nombre y apellidos" autocomplete="off">
+    </div>
+    <div class="field-group">
+      <label>EMAIL</label>
+      <input type="email" id="input-email" placeholder="tu@email.com" autocomplete="off">
+    </div>
+    <div class="field-group">
+      <label>AÑOS DE EXPERIENCIA EN DATA ENGINEERING</label>
+      <input type="text" id="input-exp" placeholder="Ej: 4 años" autocomplete="off">
+    </div>
+
+    <button class="btn btn-primary btn-lg" onclick="startTest()" id="btn-start" disabled>
+      Comenzar el test →
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TEST SCREEN
+════════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-test">
+  <div class="test-body">
+    <div class="test-main" id="test-main">
+      <!-- Sections rendered by JS -->
+    </div>
+  </div>
+  <div class="nav-bar">
+    <div class="nav-info" id="nav-info">Parte 1 de 4</div>
+    <div class="nav-actions">
+      <button class="btn btn-outline" onclick="prevSection()" id="btn-prev">← Anterior</button>
+      <button class="btn btn-primary" onclick="nextSection()" id="btn-next">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SUBMIT SCREEN
+════════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-submit">
+  <div style="width:100%;max-width:520px">
+    <h2>Revisar y enviar</h2>
+    <p>Comprueba el resumen antes de enviar. Una vez enviado no podrás modificar las respuestas.</p>
+    <div class="submit-card">
+      <h3>Resumen de respuestas</h3>
+      <div class="submit-stat">
+        <span class="label">Test tipo test respondidas</span>
+        <span class="value" id="stat-mc">—</span>
+      </div>
+      <div class="submit-stat">
+        <span class="label">Preguntas abiertas respondidas</span>
+        <span class="value" id="stat-open">—</span>
+      </div>
+      <div class="submit-stat">
+        <span class="label">Ejercicios SQL completados</span>
+        <span class="value" id="stat-sql">—</span>
+      </div>
+      <div class="submit-stat">
+        <span class="label">Snippets Python comentados</span>
+        <span class="value" id="stat-py">—</span>
+      </div>
+      <div class="submit-stat">
+        <span class="label">Tiempo total</span>
+        <span class="value" id="stat-time">—</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <button class="btn btn-outline" onclick="goToSection(3)">← Revisar</button>
+      <button class="btn btn-primary btn-lg" onclick="submitTest()" id="btn-submit">Enviar respuestas ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     DONE SCREEN
+════════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-done">
+  <div>
+    <div class="success-icon">✓</div>
+    <h2 style="font-size:28px;font-weight:300;margin-bottom:12px">Prueba enviada</h2>
+    <p style="color:var(--textDim);max-width:400px;margin:0 auto;font-size:14px">
+      Tus respuestas han sido registradas correctamente.<br>
+      El equipo se pondrá en contacto contigo en los próximos días.
+    </p>
+  </div>
+</div>
+
 <script>
 // ══════════════════════════════════════════════════════════════
 // QUESTION DATA
 // ══════════════════════════════════════════════════════════════
+
 const MC_QUESTIONS = [
   // BLOQUE A — SQL
   { id: 'a1b', block: 'A', level: 'Mid', q: 'Tienes una tabla de ventas con millones de registros. ¿Cuál sería la consulta SQL óptima para calcular el monto total de ventas por cliente durante el último año, incluyendo solo aquellos clientes cuyos pedidos superan los 1000€ en total?', opts: [
-    'Usar GROUP BY cliente_id y un HAVING SUM(monto) > 1000, filtrando por fecha en el WHERE',
-    'Agrupar por fecha y sumar los pedidos, luego filtrar clientes en el SELECT',
-    'Hacer un JOIN con la tabla de clientes y filtrar en el SELECT',
-    'Usar una subconsulta para traer todos los pedidos y luego agrupar'
-  ] },
-  { id: 'a2b', block: 'A', level: 'Mid', q: 'En una base de datos analítica, necesitas calcular el ranking de ingresos por producto para cada país. ¿Qué función SQL utilizarías y cómo sería el approach?', opts: [
-    'Usar la función RANK() OVER (PARTITION BY pais ORDER BY ingresos DESC)',
-    'Hacer un JOIN de todas las tablas y agrupar por país y producto',
-    'Utilizar la función SUM() en una subconsulta',
-    'RANK() OVER (ORDER BY producto)'
-  ] },
-  { id:'a4', block:'A', level:'Mid', q:'¿Qué tipo de Slowly Changing Dimension (SCD) añade una nueva fila cuando un atributo cambia, preservando el historial?', opts:['SCD Tipo 0','SCD Tipo 1','SCD Tipo 2','SCD Tipo 3'] },
-  { id:'a5', block:'A', level:'Senior', q:'¿Cuál es la estrategia más eficiente para calcular totales acumulados (running totals) sobre millones de filas en un warehouse columnar?', opts:['Subconsultas correlacionadas','Ventanas analíticas (OVER/PARTITION)','Cursores','Desnormalización de la tabla de hechos'] },
-  { id:'a6', block:'A', level:'Senior', q:"En un data warehouse de gran volumen, ¿qué es la 'partition pruning' y cuándo ocurre?", opts:['Eliminar columnas redundantes de la tabla de hechos','El motor escanea solo las particiones relevantes según los filtros','Reordenar los fragmentos en el almacenamiento','Actualizar los índices secundarios antes de cada query'] },
+  'Usar GROUP BY cliente_id y un HAVING SUM(monto) > 1000, filtrando por fecha en el WHERE',
+  'Agrupar por fecha y sumar los pedidos, luego filtrar clientes en el SELECT',
+  'Hacer un JOIN con la tabla de clientes y filtrar en el SELECT',
+  'Usar una subconsulta para traer todos los pedidos y luego agrupar'
+]},
+{ id: 'a2b', block: 'A', level: 'Mid', q: 'En una base de datos analítica, necesitas calcular el ranking de ingresos por producto para cada país. ¿Qué función SQL utilizarías y cómo sería el approach?', opts: [
+  'Usar la función RANK() OVER (PARTITION BY pais ORDER BY ingresos DESC)',
+  'Hacer un JOIN de todas las tablas y agrupar por país y producto',
+  'Utilizar la función SUM() en una subconsulta',
+  'RANK() OVER (ORDER BY producto)'
+]},
+  
+  
+  { id:'a4', block:'A', level:'Mid', q:'¿Qué tipo de Slowly Changing Dimension (SCD) añade una nueva fila cuando un atributo cambia, preservando el historial?', opts:['SCD Tipo 0','SCD Tipo 1','SCD Tipo 2','SCD Tipo 3'], correct:2 },
+  { id:'a5', block:'A', level:'Senior', q:'¿Cuál es la estrategia más eficiente para calcular totales acumulados (running totals) sobre millones de filas en un warehouse columnar?', opts:['Subconsulta correlacionada con SUM sobre todas las filas anteriores','Función de ventana: SUM() OVER (ORDER BY fecha ROWS UNBOUNDED PRECEDING)','Cursor iterando fila a fila','Tabla temporal con los totales + JOIN'], correct:1 },
+  { id:'a6', block:'A', level:'Senior', q:"En un data warehouse de gran volumen, ¿qué es la 'partition pruning' y cuándo ocurre?", opts:['Eliminar columnas redundantes de la tabla de hechos','El motor salta particiones que no pueden contener datos relevantes para el filtro aplicado','Comprimir las particiones más antiguas automáticamente','Dividir una partición grande en varias más pequeñas'], correct:1 },
   // BLOQUE B — Arquitecturas
-  { id:'b1', block:'B', level:'Junior', q:'¿Qué diferencia un Data Lake de un Data Warehouse?', opts:['El Data Lake solo almacena datos relacionales; el DWH acepta cualquier formato','El Data Lake acepta todos los formatos (JSON, Parquet, CSV, binario), el DWH estructura y optimiza para analítica','El DWH siempre está en cloud, el Data Lake on-premises','No existe diferencia técnica'] },
-  { id:'b2', block:'B', level:'Junior', q:'En una arquitectura medallion (Bronze/Silver/Gold), ¿qué contiene la capa Bronze?', opts:['Datos agregados listos para consumo de negocio','Datos limpios y validados','Datos crudos, sin procesar','Datos enriquecidos por ML'] },
-  { id:'b3', block:'B', level:'Mid', q:'¿Cuál es la principal ventaja del patrón Lambda Architecture frente a procesar todo en batch?', opts:['Elimina completamente el procesamiento batch','Combina procesamiento batch y streaming para reducir latencia y ofrecer consistencia','Permite usar solo NoSQL','Es más barata en todos los casos'] },
-  { id:'b4', block:'B', level:'Mid', q:"¿Qué es un 'data lakehouse' y qué problema resuelve frente al data lake tradicional?", opts:['Un data lake con más capacidad de almacenamiento','Un DWH migrado a arquitectura cloud','Ofrece gobernanza, ACID y permite BI avanzado sobre el lago','Es solo un nombre comercial para un data lake'] },
-  { id:'b5', block:'B', level:'Senior', q:"En streaming, ¿cuál es la diferencia entre 'event time' y 'processing time'?", opts:['Son sinónimos; solo el nombre cambia según el framework','Event time refleja cuándo ocurrió el dato, processing time cuándo lo procesa el sistema','Ambos significan latencia cero','Solo aplican a bases de datos relacionales'] },
-  { id:'b6', block:'B', level:'Senior', q:'¿Qué garantías de consistencia ofrece Delta Lake frente a Parquet puro?', opts:['Delta ofrece mayor compresión','Delta añade ACID, time travel, schema evolution y transacciones, Parquet no garantiza consistencia','No hay ninguna diferencia','Parquet soporta ACID y transacciones, Delta solo parquet'] },
+  { id:'b1', block:'B', level:'Junior', q:'¿Qué diferencia un Data Lake de un Data Warehouse?', opts:['El Data Lake solo almacena datos relacionales; el DWH acepta cualquier formato','El Data Lake almacena datos en formato raw sin estructura fija; el DWH almacena datos estructurados y modelados','El Data Warehouse es más barato de mantener','No hay diferencia relevante, son sinónimos modernos'], correct:1 },
+  { id:'b2', block:'B', level:'Junior', q:'En una arquitectura medallion (Bronze/Silver/Gold), ¿qué contiene la capa Bronze?', opts:['Datos agregados listos para consumo de negocio','Datos limpios y normalizados','Datos raw tal como llegan de la fuente, sin transformar','Modelos de Machine Learning entrenados'], correct:2 },
+  { id:'b3', block:'B', level:'Mid', q:'¿Cuál es la principal ventaja del patrón Lambda Architecture frente a procesar todo en batch?', opts:['Elimina completamente el procesamiento batch','Combina batch (alta precisión, alta latencia) con streaming (baja latencia, aproximados) para respuestas en tiempo real','Es más sencillo de implementar que un pipeline batch puro','Solo funciona con datos estructurados'], correct:1 },
+  { id:'b4', block:'B', level:'Mid', q:"¿Qué es un 'data lakehouse' y qué problema resuelve frente al data lake tradicional?", opts:['Un data lake con más capacidad de almacenamiento','Un DWH migrado a cloud sin cambios','Arquitectura que añade ACID, schema enforcement y rendimiento analítico sobre el storage del data lake','Un sistema que reemplaza el data lake por un warehouse columnar'], correct:2 },
+  { id:'b5', block:'B', level:'Senior', q:"En streaming, ¿cuál es la diferencia entre 'event time' y 'processing time'?", opts:['Son sinónimos; solo el nombre cambia según el framework','Event time es cuándo ocurrió el evento en la fuente; processing time es cuándo llega al sistema. Importa por los eventos desordenados y late data','Event time solo aplica a datos IoT','Processing time siempre es mayor que event time'], correct:1 },
+  { id:'b6', block:'B', level:'Senior', q:'¿Qué garantías de consistencia ofrece Delta Lake frente a Parquet puro?', opts:['Delta ofrece mayor compresión','Delta añade ACID, time travel, schema enforcement y DML (UPDATE/DELETE/MERGE)','Parquet tiene soporte transaccional nativo; Delta solo añade índices','Delta Lake solo funciona con Spark'], correct:1 },
   // BLOQUE C — Orquestación
-  { id:'c1', block:'C', level:'Junior', q:'¿Qué es un DAG en el contexto de Apache Airflow?', opts:['Una base de datos optimizada para grafos','Un Directed Acyclic Graph: define tareas de un workflow y su dependencia','Un algoritmo de optimización para Spark','Un tipo de tabla particionada'] },
-  { id:'c2', block:'C', level:'Junior', q:'¿Cuál describe mejor el concepto de idempotencia en un pipeline de datos?', opts:['El pipeline se ejecuta automáticamente si falla','Ejecutar el pipeline múltiples veces da el mismo resultado sin duplicar datos','Idempotencia es solo para APIs REST','Significa que el pipeline se paraleliza en clústeres'] },
-  { id:'c3', block:'C', level:'Mid', q:"¿Cuál es la diferencia entre un trigger de tipo 'schedule' y uno de tipo 'sensor' en Airflow?", opts:["El schedule ejecuta en base a tiempo; el sensor espera una condición externa","Ambos ejecutan tareas al llegar datos, pero el sensor solo detecta archivos locales","Schedule es solo para procesos ETL en cloud, sensor para batch local","No existe un trigger tipo sensor en Airflow"] },
-  { id:'c4', block:'C', level:'Mid', q:'¿Qué estrategia de re-ejecución parcial permite Airflow cuando un paso intermedio falla?', opts:['Reiniciar siempre desde el primer paso','Clear y re-run de tareas específicas','Solo reiniciar el DAG completo','No permite re-ejecución parcial'] },
-  { id:'c5', block:'C', level:'Senior', q:'¿Cuál es la afirmación correcta sobre ELT frente a ETL en cloud data platforms?', opts:['ELT es siempre más rápido independientemente del volumen','ETL transforma los datos antes de cargarlos; ELT los carga y luego transforma aprovechando el poder del warehouse','Ambos significan lo mismo','Solo ETL aprovecha recursos cloud scalable'] },
-  { id:'c6', block:'C', level:'Senior', q:"¿Qué problema resuelve el concepto de 'backfill' en Airflow?", opts:['Llenar el storage cuando está casi lleno','Ejecutar runs de DAG para intervalos de tiempo anteriores que no se ejecutaron','Hacer un backup completo del DAG','Ejecutar dos veces los mismos steps como test'] },
+  { id:'c1', block:'C', level:'Junior', q:'¿Qué es un DAG en el contexto de Apache Airflow?', opts:['Una base de datos optimizada para grafos','Un Directed Acyclic Graph: define tareas de un workflow y sus dependencias sin ciclos','Un contenedor Docker para ejecutar pipelines','Un formato YAML para configurar pipelines'], correct:1 },
+  { id:'c2', block:'C', level:'Junior', q:'¿Cuál describe mejor el concepto de idempotencia en un pipeline de datos?', opts:['El pipeline se ejecuta automáticamente si falla','Ejecutar el pipeline múltiples veces con el mismo input produce siempre el mismo resultado sin efectos secundarios','El pipeline procesa datos en orden estrictamente cronológico','El pipeline puede ejecutarse en paralelo sin coordinación'], correct:1 },
+  { id:'c3', block:'C', level:'Mid', q:"¿Cuál es la diferencia entre un trigger de tipo 'schedule' y uno de tipo 'sensor' en Airflow?", opts:["El schedule ejecuta en base a tiempo; el sensor espera a que una condición externa se cumpla (ej: que exista un fichero)",'El sensor es más rápido que el schedule','Son sinónimos en Airflow moderno','El sensor solo funciona con bases de datos; el schedule con ficheros'], correct:0 },
+  { id:'c4', block:'C', level:'Mid', q:'¿Qué estrategia de re-ejecución parcial permite Airflow cuando un paso intermedio falla?', opts:['Reiniciar siempre desde el primer paso','Clear y re-run de las tareas fallidas y sus descendientes, manteniendo el estado de las tareas exitosas','Airflow no soporta re-ejecución parcial','Solo se puede re-ejecutar el último paso'], correct:1 },
+  { id:'c5', block:'C', level:'Senior', q:'¿Cuál es la afirmación correcta sobre ELT frente a ETL en cloud data platforms?', opts:['ELT es siempre más rápido independientemente del volumen','ETL transforma antes de cargar; ELT carga en crudo y transforma dentro del warehouse aprovechando su cómputo','ELT elimina la necesidad de orquestación','ETL es la única opción válida para streaming'], correct:1 },
+  { id:'c6', block:'C', level:'Senior', q:"¿Qué problema resuelve el concepto de 'backfill' en Airflow?", opts:['Llenar el storage cuando está casi lleno','Ejecutar runs de DAG para intervalos de tiempo pasados que no se procesaron en su momento','Revertir cambios en la base de datos de metadatos','Precalentar la caché de resultados'], correct:1 },
   // BLOQUE D — Cloud
-  { id:'d1', block:'D', level:'Junior', q:'¿Qué tipo de almacenamiento cloud es más adecuado para un data lake con petabytes de datos históricos raramente consultados?', opts:['Almacenamiento de objetos estándar (S3 Standard, Azure Blob)', 'SSD locales en las VMs de cómputo', 'Almacenamiento en cinta', 'Almacenamiento de objetos tipo cold/infrequent access (S3 Glacier, Azure Blob Archive)'] },
-  { id:'d2', block:'D', level:'Junior', q:"¿Qué significa que un servicio cloud sea 'serverless' en data engineering?", opts:['No tiene servidor físico; los datos se almacenan en la nube de otro proveedor','No requiere provisionar ni administrar servidores. El escalado es automático y se paga solo por uso','Solo sirve para buckets de almacenamiento, nunca para procesos','Serverless significa menor rendimiento automático'] },
-  { id:'d3', block:'D', level:'Mid', q:'En AWS, ¿cuál es la diferencia entre S3 Standard, S3 Intelligent-Tiering y S3 Glacier?', opts:['Solo difieren en el límite de tamaño de objeto','Standard: acceso frecuente; Intelligent-Tiering: puede cambiar de capa; Glacier: almacenamiento frío y acceso muy lento','Standard es el más barato para históricos','Solo Standard tiene cifrado por defecto'] },
-  { id:'d4', block:'D', level:'Mid', q:"¿Qué es el 'egress cost' en cloud y por qué es relevante en arquitecturas multi-cloud?", opts:['El coste de ingestar datos desde fuentes externas','El coste de transferir datos fuera del cloud (saliente) puede ser muy alto y afecta la interoperabilidad','Es el coste de refrescar dashboards en Power BI','No existen costes por egress en cloud público'] },
-  { id:'d5', block:'D', level:'Senior', q:'En Kubernetes (EKS/AKS/GKE), ¿cuál es la ventaja de Karpenter frente al Cluster Autoscaler clásico?', opts:['Karpenter solo funciona en AWS','Karpenter provisiona nodos mucho más rápido y eficiente usando eventos y permite scaling más granular','El autoscaler solo escala horizontal, Karpenter vertical','Ambos son exactamente iguales en coste y rapidez'] },
+  { id:'d1', block:'D', level:'Junior', q:'¿Qué tipo de almacenamiento cloud es más adecuado para un data lake con petabytes de datos históricos raramente consultados?', opts:['Almacenamiento de objetos (S3, ADLS, GCS) con política de ciclo de vida a tier frío','Base de datos relacional gestionada (RDS, Cloud SQL)','Disco SSD adjunto a instancias de cómputo','Almacenamiento en memoria (ElastiCache, Redis)'], correct:0 },
+  { id:'d2', block:'D', level:'Junior', q:"¿Qué significa que un servicio cloud sea 'serverless' en data engineering?", opts:['No tiene servidor físico; los datos se almacenan en la nube de otro proveedor','No requiere aprovisionar ni gestionar infraestructura; el proveedor escala automáticamente y se factura por uso real','Es gratuito para cargas pequeñas','Solo funciona sin conexión a internet'], correct:1 },
+  { id:'d3', block:'D', level:'Mid', q:'En AWS, ¿cuál es la diferencia entre S3 Standard, S3 Intelligent-Tiering y S3 Glacier?', opts:['Solo difieren en el límite de tamaño de objeto','Standard: acceso frecuente; Intelligent-Tiering: mueve objetos según patrón de acceso; Glacier: archivado, latencia alta, coste muy bajo','Intelligent-Tiering y Glacier son sinónimos','Standard es la única opción con 11 nueves de durabilidad'], correct:1 },
+  { id:'d4', block:'D', level:'Mid', q:"¿Qué es el 'egress cost' en cloud y por qué es relevante en arquitecturas multi-cloud?", opts:['El coste de ingestar datos desde fuentes externas','El coste de transferir datos fuera de la región o proveedor; puede ser significativo al mover grandes volúmenes entre clouds o hacia on-premise','El coste de almacenamiento de datos temporales','No existe en proveedores enterprise con contrato'], correct:1 },
+  { id:'d5', block:'D', level:'Senior', q:'En Kubernetes (EKS/AKS/GKE), ¿cuál es la ventaja de Karpenter frente al Cluster Autoscaler clásico?', opts:['Karpenter solo funciona en AWS','Karpenter provisiona nodos con los tipos de instancia óptimos para cada pod sin depender de node groups predefinidos, siendo más rápido y flexible','Cluster Autoscaler es más rápido porque usa node groups preconfigurados','No hay diferencia funcional'], correct:1 },
   // BLOQUE E — Calidad
-  { id:'e1', block:'E', level:'Junior', q:'¿Cuál de estas métricas NO es una dimensión estándar de calidad de datos?', opts:['Completitud (no hay valores nulos inesperados)','Unicidad (no hay duplicados donde no debería)','Velocidad','Consistencia'] },
-  { id:'e2', block:'E', level:'Junior', q:'¿Qué es el linaje de datos (data lineage)?', opts:['Un log de todos los usuarios que han accedido a un dataset','El registro del origen de los datos y todas las transformaciones/aplicaciones/consumos que han sufrido','La gobernanza de usuarios sobre los datos','El usuario que más datos consulta'] },
-  { id:'e3', block:'E', level:'Mid', q:'¿Qué diferencia un catálogo de datos de un diccionario de datos?', opts:['Son exactamente lo mismo con distinto nombre','El diccionario define el significado y tipos de datos; el catálogo agrega su linaje, calidad, propietarios y relaciones','El catálogo solo existe en la nube, el diccionario en on-premise','El diccionario se usa solo en SQL'] },
-  { id:'e5', block:'E', level:'Senior', q:'¿Cuál es el principal riesgo de implementar RLS solo en la capa de reporting (Power BI, Tableau) en lugar de en la capa de datos?', opts:['El RLS en reporting es suficiente','Un usuario puede acceder a datos restringidos usando otros orígenes saltándose la protección','El RLS bloquea también el acceso de los administradores','No hay diferencia relevante entre las capas'] },
+  { id:'e1', block:'E', level:'Junior', q:'¿Cuál de estas métricas NO es una dimensión estándar de calidad de datos?', opts:['Completitud (no hay valores nulos inesperados)','Unicidad (no hay duplicados)','Velocidad de ingesta (tiempo de carga)','Consistencia (valores coherentes entre sistemas)'], correct:2 },
+  { id:'e2', block:'E', level:'Junior', q:'¿Qué es el linaje de datos (data lineage)?', opts:['Un log de todos los usuarios que han accedido a un dataset','El registro del origen de los datos y todas las transformaciones que han sufrido desde la fuente hasta el destino final','Un índice para acelerar consultas sobre tablas grandes','La política de retención de datos de una organización'], correct:1 },
+  { id:'e3', block:'E', level:'Mid', q:'¿Qué diferencia un catálogo de datos de un diccionario de datos?', opts:['Son exactamente lo mismo con distinto nombre','El diccionario define el significado técnico de campos; el catálogo añade descubrimiento, linaje, métricas de calidad, clasificación y colaboración','El catálogo solo cubre datos estructurados','El diccionario es una funcionalidad dentro del catálogo'], correct:1 },
+  
+  { id:'e5', block:'E', level:'Senior', q:'¿Cuál es el principal riesgo de implementar RLS solo en la capa de reporting (Power BI, Tableau) en lugar de en la capa de datos?', opts:['El RLS en reporting es más difícil de configurar','Si los usuarios acceden por otras vías (APIs, SQL directo, exports), el RLS de reporting no aplica y los datos quedan desprotegidos','El RLS en reporting tiene peor rendimiento','No hay riesgo diferencial; son equivalentes en seguridad'], correct:1 },
   // BLOQUE F — Fabric
-  { id:'f1', block:'F', level:'Junior', q:'¿Cuál es el formato de almacenamiento nativo de las tablas en un Microsoft Fabric Lakehouse?', opts:['CSV comprimido con GZIP','Apache Parquet sin gestión transaccional','Delta Lake (Parquet + transacciones)','JSON Lines'] },
-  { id:'f2', block:'F', level:'Junior', q:"¿Qué es un 'Shortcut' en Microsoft Fabric OneLake?", opts:['Un acceso directo a una dashboard de Power BI','Una referencia a datos en storage externo (S3, Lakehouse, otros workspaces)','Un conector para APIs REST','Cualquier base de datos relacional abierta'] },
-  { id:'f3', block:'F', level:'Mid', q:'¿Cuándo es preferible usar Fabric Warehouse frente a Fabric Lakehouse?', opts:['Cuando se necesita procesar datos con PySpark o Python','Cuando el equipo usa principalmente SQL y requiere features DWH','Solo si el tamaño es <100GB','Warehouse solo sirve para informes, Lakehouse para ML'] },
-  { id:'f4', block:'F', level:'Mid', q:"¿Qué modo de conectividad usa Power BI en 'Direct Lake' y cuál es su principal limitación?", opts:['Lee Delta Files en OneLake sin importarlos; la limitación es que no soporta por ahora features avanzados como Security RLS ni reporting composite','Siempre importa los datos, nunca accede en tiempo real','Direct Lake es solo para datos internos, nunca para externos','Direct Lake utiliza tablas JSON internas'] },
-  { id:'f5', block:'F', level:'Senior', q:'En Microsoft Fabric, ¿cómo se gestiona el aislamiento entre entornos (Dev/Test/Prod)?', opts:['Fabric no soporta múltiples entornos','Mediante Deployment Pipelines y promoción entre stages','Solo con workspaces independientes','No hay ningún mecanismo soportado por plataforma'] },
-  { id:'f6', block:'F', level:'Senior', q:"¿Qué implica el 'capacity throttling' en Microsoft Fabric?", opts:['El workspace se pausa automáticamente después de 8 horas','Cuando los workloads consumen muchos recursos y exceden los límites se ralentizan las operaciones y pueden pararse temporalmente','Impide crear nuevos Lakehouses','El throttling solo existe en Synapse'] },
-  { id:'f7', block:'F', level:'Senior', q:'¿Cuál es la diferencia entre OneLake Data Access Roles y Workspace Roles en Fabric?', opts:['Son el mismo mecanismo con distinto nombre','Workspace Roles controlan acceso a features del entorno, OneLake Data Access autoriza acceso directo a datos','Solo existen los Data Access Roles','Solo existen los Workspace Roles'] }
+  { id:'f1', block:'F', level:'Junior', q:'¿Cuál es el formato de almacenamiento nativo de las tablas en un Microsoft Fabric Lakehouse?', opts:['CSV comprimido con GZIP','Apache Parquet sin gestión transaccional','Delta Lake (Delta Parquet con transaction log)','ORC (Optimized Row Columnar)'], correct:2 },
+  { id:'f2', block:'F', level:'Junior', q:"¿Qué es un 'Shortcut' en Microsoft Fabric OneLake?", opts:['Un acceso directo a una dashboard de Power BI','Una referencia a datos en storage externo (S3, ADLS, GCS) que permite leerlos desde Fabric sin moverlos físicamente','Un alias para renombrar tablas dentro del Lakehouse','Un tipo de pipeline optimizado para cargas incrementales'], correct:1 },
+  { id:'f3', block:'F', level:'Mid', q:'¿Cuándo es preferible usar Fabric Warehouse frente a Fabric Lakehouse?', opts:['Cuando se necesita procesar datos con PySpark o Python','Cuando el equipo usa SQL puro, necesita DML transaccional (UPDATE/DELETE), o tiene un modelo dimensional clásico tipo Kimball','Cuando los datos son semiestructurados (JSON, XML)','Cuando el volumen supera 1 TB'], correct:1 },
+  { id:'f4', block:'F', level:'Mid', q:"¿Qué modo de conectividad usa Power BI en 'Direct Lake' y cuál es su principal limitación?", opts:['Lee Delta Files en OneLake sin importarlos; la limitación es el tope de filas por tabla según el SKU de capacidad, con fallback a DirectQuery','Importa datos al modelo cada hora; la limitación es la latencia','Usa DirectQuery sobre el SQL Endpoint; la limitación es el rendimiento en modelos complejos','Direct Lake no tiene limitaciones; es superior a Import Mode en todos los escenarios'], correct:0 },
+  { id:'f5', block:'F', level:'Senior', q:'En Microsoft Fabric, ¿cómo se gestiona el aislamiento entre entornos (Dev/Test/Prod)?', opts:['Fabric no soporta múltiples entornos','Mediante Deployment Pipelines (Dev→Test→Prod) con integración Git y workspaces separados por entorno','Solo se puede usar un workspace por tenant de Microsoft 365','El aislamiento se gestiona exclusivamente mediante ramas de Git sin herramienta nativa'], correct:1 },
+  { id:'f6', block:'F', level:'Senior', q:"¿Qué implica el 'capacity throttling' en Microsoft Fabric?", opts:['El workspace se pausa automáticamente después de 8 horas','Cuando los workloads consumen más CUs de los asignados, Fabric limita o encola la ejecución; se mitiga separando cargas pesadas en horarios distintos y optimizando jobs','Solo ocurre con capacidades F2 y F4','El throttling elimina datos procesados a medias'], correct:1 },
+  { id:'f7', block:'F', level:'Senior', q:'¿Cuál es la diferencia entre OneLake Data Access Roles y Workspace Roles en Fabric?', opts:['Son el mismo mecanismo con distinto nombre','Workspace Roles controlan acceso a artefactos del workspace; OneLake Data Access Roles permiten control granular a nivel de carpeta o tabla dentro del lakehouse','OneLake Data Access Roles solo aplican a shortcuts externos','Workspace Roles son más granulares'], correct:1 },
 ];
-// ... resto del script igual ...
+
+const OPEN_QUESTIONS = [
+  { id:'o1', level:'Junior', title:'Optimización de una consulta SQL lenta', text:'Tienes una tabla de ventas con 50 millones de filas y una consulta SQL que tarda 2 minutos. Describe paso a paso cómo abordarías la optimización.' },
+  { id:'o2', level:'Mid', title:'Pipeline de ingesta incremental', text:'Diseña un pipeline de ingesta incremental desde una base de datos transaccional (PostgreSQL) a un Data Lake. ¿Qué estrategias usarías? ¿Cuáles son sus trade-offs?' },
+  { id:'o3', level:'Mid', title:'Troubleshooting de informe Power BI lento en Fabric', text:'Un Data Analyst te dice que su informe de Power BI tarda 30 segundos en cargar y antes tardaba 3 segundos. El entorno es Microsoft Fabric. ¿Cómo investigarías el problema y qué causas considerarías?' },
+  { id:'o4', level:'Senior', title:'Arquitectura de ingesta multi-fuente en Fabric', text:'Tu empresa quiere consolidar datos de 5 fuentes distintas (2 en AWS, 1 en Azure, 1 on-premise y 1 SaaS) en Microsoft Fabric. ¿Cómo diseñarías la arquitectura de ingesta? ¿Qué riesgos contemplarías?' },
+  { id:'o5', level:'Senior', title:'Migración de Databricks a Microsoft Fabric', text:'¿Cómo convencerías a un equipo técnico experimentado en Databricks de migrar a Microsoft Fabric? ¿Y cuándo NO lo harías? Argumenta con criterio técnico.' },
+  { id:'o6', level:'Mid', title:'Deuda técnica en data engineering', text:'Explica qué es la deuda técnica en un contexto de data engineering. Da un ejemplo concreto de cómo se genera y cómo se aborda.' },
+  { id:'o7', level:'Senior', title:'Estrategia de observabilidad para una data platform', text:'Describe cómo implementarías una estrategia de observabilidad completa para una data platform en producción. ¿Qué monitorizarías y con qué herramientas?' },
+  { id:'o8', level:'Mid', title:'dbt y el patrón ELT moderno', text:'¿Qué es dbt (data build tool) y en qué se diferencia de un pipeline de transformación tradicional con Spark o SQL scripts?' },
+];
+
+const SQL_EXERCISES = [
+  {
+    id:'s1', level:'Junior', type:'LECTURA', title:'¿Qué devuelve esta query? Explica cada parte.',
+    prompt:'Analiza la siguiente consulta y explica con tus palabras qué resultado produce y por qué. Presta atención a cada cláusula.',
+    code:`SELECT
+    c.ciudad,
+    COUNT(DISTINCT p.pedido_id)              AS total_pedidos,
+    SUM(l.cantidad * l.precio_unitario)      AS ingresos_totales,
+    ROUND(
+        SUM(l.cantidad * l.precio_unitario) /
+        COUNT(DISTINCT p.pedido_id), 2
+    )                                        AS ticket_medio
+FROM clientes c
+JOIN pedidos p       ON c.cliente_id = p.cliente_id
+JOIN lineas_pedido l ON p.pedido_id  = l.pedido_id
+WHERE p.fecha  >= '2024-01-01'
+  AND p.estado  = 'completado'
+GROUP BY c.ciudad
+HAVING SUM(l.cantidad * l.precio_unitario) > 10000
+ORDER BY ingresos_totales DESC;`,
+    answers:[{ label:'Tu explicación', placeholder:'Explica qué devuelve esta query, qué hace cada cláusula (WHERE, HAVING, ORDER BY...) y por qué se usa COUNT(DISTINCT).', rows:8, mono:false }]
+  },
+  {
+    id:'s2', level:'Mid', type:'LECTURA', title:'¿Qué hace esta query? ¿Detectas algún problema potencial?',
+    prompt:'Explica qué devuelve la siguiente consulta. Señala cualquier aspecto que considerarías un riesgo o que mejorarías.',
+    code:`WITH ventas_mensuales AS (
+    SELECT
+        p.cliente_id,
+        DATE_TRUNC('month', p.fecha)         AS mes,
+        SUM(l.cantidad * l.precio_unitario)  AS importe
+    FROM pedidos p
+    JOIN lineas_pedido l ON p.pedido_id = l.pedido_id
+    WHERE p.estado != 'cancelado'
+    GROUP BY p.cliente_id, DATE_TRUNC('month', p.fecha)
+),
+ventas_con_ranking AS (
+    SELECT
+        cliente_id,
+        mes,
+        importe,
+        RANK() OVER (
+            PARTITION BY mes
+            ORDER BY importe DESC
+        ) AS ranking_mes
+    FROM ventas_mensuales
+)
+SELECT *
+FROM ventas_con_ranking
+WHERE ranking_mes <= 3;`,
+    answers:[
+      { label:'¿Qué devuelve?', placeholder:'Explica qué resultado produce la query y el propósito de cada CTE.', rows:5, mono:false },
+      { label:'Problemas detectados y mejoras', placeholder:'¿Hay algún riesgo en el uso de RANK()? ¿Qué cambiarías?', rows:5, mono:false },
+    ]
+  },
+  {
+    id:'s3', level:'Junior', type:'CORRECCIÓN', title:'Identifica los errores y escribe la query corregida.',
+    prompt:'El analista quería obtener el importe medio de pedido por segmento de cliente. La query falla o devuelve resultados incorrectos. Identifica todos los errores.',
+    code:`SELECT
+    c.segmento,
+    AVG(p.pedido_id)       AS importe_medio,   -- ¿correcto?
+    COUNT(p.pedido_id)     AS total_pedidos
+FROM pedidos p
+JOIN clientes c ON p.cliente_id = c.cliente_id
+WHERE c.segmento = 'Premium' OR 'VIP'          -- ¿correcto?
+GROUP BY p.cliente_id                           -- ¿correcto?
+HAVING total_pedidos > 5                        -- ¿correcto?
+ORDER BY importe_medio;`,
+    answers:[
+      { label:'Errores identificados (uno por línea)', placeholder:'Error 1: ...\nError 2: ...\nError 3: ...\nError 4: ...', rows:6, mono:false },
+      { label:'Query corregida', placeholder:'-- Escribe aquí la query corregida\nSELECT ...', rows:12, mono:true },
+    ]
+  },
+  {
+    id:'s4', level:'Mid', type:'CORRECCIÓN', title:'Bug lógico sutil — encuéntralo y corrígelo.',
+    prompt:'El equipo quiere saber qué clientes NO han realizado ningún pedido en 2024. La query se ejecuta sin error pero devuelve resultados incorrectos. Explica por qué y escribe la solución.',
+    code:`SELECT DISTINCT
+    c.cliente_id,
+    c.nombre
+FROM clientes c
+LEFT JOIN pedidos p
+    ON  c.cliente_id = p.cliente_id
+    AND p.fecha >= '2024-01-01'
+WHERE p.estado != 'cancelado';`,
+    answers:[
+      { label:'¿Por qué falla?', placeholder:'Explica el bug lógico y qué ocurre con los NULL en la cláusula WHERE.', rows:5, mono:false },
+      { label:'Query corregida (una o más soluciones)', placeholder:'-- Solución 1:\n\n-- Solución 2 (alternativa):',  rows:14, mono:true },
+    ]
+  },
+  {
+    id:'s5', level:'Mid', type:'ESCRITURA', title:'Informe de retención mensual',
+    prompt:'Para cada mes de 2023, queremos saber cuántos clientes que compraron ese mes también compraron el mes siguiente. Escribe una query que devuelva: mes | clientes_activos | clientes_retenidos | tasa_retencion_pct.',
+    hint:'Excluye pedidos cancelados. Considera cómo evitar divisiones por cero en el cálculo del porcentaje.',
+    answers:[{ label:'Tu solución SQL', placeholder:'-- Escribe tu query aquí\nWITH ...', rows:22, mono:true }]
+  },
+  {
+    id:'s6', level:'Senior', type:'ESCRITURA', title:'Detección de anomalías de volumen por producto',
+    prompt:'Para cada producto, compara el importe de ventas de los últimos 7 días con la media diaria de los 28 días anteriores. Devuelve solo los productos donde la desviación supere el ±50%. Columnas: producto_id | nombre | importe_7d | media_28d_anterior | desviacion_pct.',
+    hint:'Usa CURRENT_DATE como fecha de referencia. Considera qué ocurre con productos sin historial en el periodo anterior.',
+    answers:[{ label:'Tu solución SQL', placeholder:'-- Escribe tu query aquí\nWITH ...', rows:26, mono:true }]
+  },
+];
+
+const PYTHON_EXERCISES = [
+  {
+    id:'p1', level:'Junior', title:'Carga y transformación básica con pandas',
+    prompt:'Explica qué hace este script paso a paso. ¿Hay algún problema potencial si se usa en producción?',
+    code:`import pandas as pd
+
+def procesar_pedidos(ruta_fichero: str) -> pd.DataFrame:
+    df = pd.read_csv(ruta_fichero)
+
+    df['fecha']   = pd.to_datetime(df['fecha'])
+    df['importe'] = df['cantidad'] * df['precio_unitario']
+
+    df = df[df['estado'] != 'cancelado']
+
+    resumen = df.groupby('cliente_id').agg(
+        total_pedidos  = ('pedido_id', 'nunique'),
+        importe_total  = ('importe',   'sum'),
+        primera_compra = ('fecha',     'min'),
+        ultima_compra  = ('fecha',     'max'),
+    ).reset_index()
+
+    resumen['ticket_medio'] = (
+        resumen['importe_total'] / resumen['total_pedidos']
+    )
+
+    return resumen.sort_values('importe_total', ascending=False)`,
+    answers:[
+      { label:'¿Qué hace? Explica cada bloque', placeholder:'Explica paso a paso qué hace cada parte del código.', rows:6, mono:false },
+      { label:'Problemas en producción y mejoras', placeholder:'¿Qué fallaría en producción? ¿Qué cambiarías?', rows:5, mono:false },
+    ]
+  },
+  {
+    id:'p2', level:'Mid', title:'Ingesta incremental basada en watermark',
+    prompt:'¿Qué hace esta función? ¿Qué problemas tiene para usarla en producción? Presta especial atención a la línea marcada con el comentario.',
+    code:`import pandas as pd
+import logging
+from pathlib import Path
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
+
+def ingestar_incremental(
+    origen: str,
+    destino: str,
+    watermark_col: str = 'updated_at',
+    ultimo_proceso: datetime | None = None,
+) -> dict:
+
+    df = pd.read_parquet(origen)
+
+    if ultimo_proceso is not None:
+        df = df[df[watermark_col] > ultimo_proceso]
+
+    if df.empty:
+        logger.info('Sin registros nuevos desde %s', ultimo_proceso)
+        return {'registros': 0, 'status': 'skipped'}
+
+    ruta = Path(destino)
+    modo = 'a' if ruta.exists() else 'w'   # <-- ojo aquí
+
+    df.to_parquet(destino, engine='pyarrow', index=False)
+
+    nuevo_watermark = df[watermark_col].max()
+    logger.info('Procesados %d registros. Nuevo watermark: %s',
+                len(df), nuevo_watermark)
+
+    return {'registros': len(df), 'watermark': nuevo_watermark, 'status': 'ok'}`,
+    answers:[
+      { label:'¿Qué hace? ¿Qué patrón implementa?', placeholder:'Explica el propósito de la función y el patrón de diseño utilizado.', rows:5, mono:false },
+      { label:'Problemas identificados y mejoras', placeholder:'¿Qué problemas tiene? Especialmente, ¿qué ocurre con la línea marcada?', rows:6, mono:false },
+    ]
+  },
+  {
+    id:'p3', level:'Mid', title:'Validación de calidad de datos con dataclass',
+    prompt:'¿Qué hace este módulo? ¿Es suficiente para un entorno de producción real? ¿Qué validaciones añadirías?',
+    code:`from dataclasses import dataclass, field
+import pandas as pd
+
+@dataclass
+class ResultadoValidacion:
+    valido: bool = True
+    errores: list[str] = field(default_factory=list)
+
+    def fallo(self, msg: str):
+        self.valido = False
+        self.errores.append(msg)
+
+
+def validar_pedidos(df: pd.DataFrame) -> ResultadoValidacion:
+    r = ResultadoValidacion()
+
+    # 1. Columnas obligatorias
+    requeridas = {'pedido_id', 'cliente_id', 'fecha', 'estado', 'importe'}
+    faltantes  = requeridas - set(df.columns)
+    if faltantes:
+        r.fallo(f'Columnas faltantes: {faltantes}')
+        return r
+
+    # 2. Nulos en columnas críticas
+    for col in ['pedido_id', 'cliente_id', 'fecha']:
+        n = df[col].isna().sum()
+        if n > 0:
+            r.fallo(f'{col}: {n} valores nulos')
+
+    # 3. Importes negativos
+    if (df['importe'] < 0).sum() > 0:
+        r.fallo(f"importe: {(df['importe'] < 0).sum()} valores negativos")
+
+    # 4. Estados válidos
+    estados_ok = {'pendiente', 'completado', 'cancelado', 'devuelto'}
+    invalidos  = ~df['estado'].isin(estados_ok)
+    if invalidos.any():
+        r.fallo(f"estados inválidos: {df.loc[invalidos,'estado'].unique().tolist()}")
+
+    # 5. Duplicados en PK
+    dupes = df['pedido_id'].duplicated().sum()
+    if dupes > 0:
+        r.fallo(f'pedido_id: {dupes} duplicados')
+
+    return r`,
+    answers:[
+      { label:'¿Qué hace? Describe el patrón de diseño', placeholder:'Explica la lógica y por qué se acumulan los errores en lugar de lanzar excepción al primer fallo.', rows:5, mono:false },
+      { label:'¿Es suficiente para producción? ¿Qué añadirías?', placeholder:'¿Qué validaciones faltan? ¿Cambiarías algo del diseño?', rows:6, mono:false },
+    ]
+  },
+  {
+    id:'p4', level:'Senior', title:'Procesamiento paralelo con chunks',
+    prompt:'Explica el patrón de diseño, sus ventajas y sus riesgos. ¿Qué cambiarías para un entorno de producción con ficheros de varios GB?',
+    code:`import pandas as pd
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Callable
+import logging
+
+logger = logging.getLogger(__name__)
+
+def procesar_en_chunks(
+    ruta: Path,
+    transform_fn: Callable[[pd.DataFrame], pd.DataFrame],
+    chunk_size: int = 100_000,
+    max_workers: int = 4,
+) -> pd.DataFrame:
+
+    reader     = pd.read_csv(ruta, chunksize=chunk_size)
+    resultados = []
+
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futuros = {
+            executor.submit(transform_fn, chunk): i
+            for i, chunk in enumerate(reader)
+        }
+        for futuro in as_completed(futuros):
+            idx = futuros[futuro]
+            try:
+                resultado = futuro.result()
+                resultados.append(resultado)
+            except Exception as e:
+                logger.error('Error en chunk %d: %s', idx, e)
+
+    if not resultados:
+        return pd.DataFrame()
+
+    return pd.concat(resultados, ignore_index=True)`,
+    answers:[
+      { label:'Patrón implementado y ventajas', placeholder:'¿Qué patrón de diseño se usa? ¿Qué ventajas ofrece?', rows:5, mono:false },
+      { label:'Riesgos y mejoras para producción', placeholder:'¿Qué riesgos tiene con ficheros grandes? ¿ThreadPoolExecutor es la elección correcta aquí?', rows:7, mono:false },
+    ]
+  },
+];
+
+// ══════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════
+const state = {
+  candidate: { name:'', email:'', exp:'' },
+  currentSection: 0,   // 0=MC, 1=Open, 2=SQL, 3=Python
+  mcAnswers: {},        // id → option index
+  openAnswers: {},      // id → text
+  sqlAnswers: {},       // id → [text, text, ...]
+  pyAnswers: {},        // id → [text, text]
+  timers: [25*60, 20*60, 20*60, 15*60],  // seconds per section
+  timerRemaining: 0,
+  timerInterval: null,
+  startTime: null,
+  tabSwitches: 0,
+  shuffledMC: [],
+};
+
+// Shuffle MC questions
+function shuffle(arr) {
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ANTI-CHEAT
+// ══════════════════════════════════════════════════════════════════
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if((e.ctrlKey||e.metaKey) && ['c','a','p','s','u'].includes(e.key.toLowerCase())) {
+    e.preventDefault();
+    showToast('Acción no permitida durante la prueba');
+  }
+  if(e.key==='F12'||((e.ctrlKey||e.metaKey)&&e.shiftKey&&['i','j'].includes(e.key.toLowerCase()))){
+    e.preventDefault();
+  }
+});
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden && state.currentSection >= 0 && state.startTime) {
+    state.tabSwitches++;
+    showToast(`Cambio de pestaña detectado (${state.tabSwitches})`);
+  }
+});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// WELCOME
+// ══════════════════════════════════════════════════════════════════
+['input-name','input-email','input-exp'].forEach(id => {
+  document.getElementById(id).addEventListener('input', checkWelcomeForm);
+});
+function checkWelcomeForm(){
+  const n=document.getElementById('input-name').value.trim();
+  const e=document.getElementById('input-email').value.trim();
+  const x=document.getElementById('input-exp').value.trim();
+  document.getElementById('btn-start').disabled = !(n && e && x);
+}
+
+function startTest(){
+  state.candidate.name  = document.getElementById('input-name').value.trim();
+  state.candidate.email = document.getElementById('input-email').value.trim();
+  state.candidate.exp   = document.getElementById('input-exp').value.trim();
+  state.shuffledMC      = shuffle(MC_QUESTIONS);
+  state.startTime       = Date.now();
+
+  document.getElementById('topbar-name').textContent = state.candidate.name;
+  document.getElementById('topbar').style.display    = 'flex';
+  document.getElementById('progress-bar').style.display = 'block';
+
+  showScreen('screen-test');
+  goToSection(0);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SCREENS
+// ══════════════════════════════════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TIMER
+// ══════════════════════════════════════════════════════════════════
+function startTimer(seconds){
+  clearInterval(state.timerInterval);
+  state.timerRemaining = seconds;
+  updateTimerUI();
+  state.timerInterval = setInterval(() => {
+    state.timerRemaining--;
+    updateTimerUI();
+    if(state.timerRemaining <= 0){
+      clearInterval(state.timerInterval);
+      showToast('⏱ Tiempo de esta sección agotado');
+    }
+  }, 1000);
+}
+
+function updateTimerUI(){
+  const r = state.timerRemaining;
+  const m = String(Math.floor(Math.abs(r)/60)).padStart(2,'0');
+  const s = String(Math.abs(r)%60).padStart(2,'0');
+  const el = document.getElementById('timer');
+  el.textContent = (r < 0 ? '+' : '') + m + ':' + s;
+  el.className = 'timer';
+  if(r < 0)       el.classList.add('danger');
+  else if(r < 120) el.classList.add('danger');
+  else if(r < 300) el.classList.add('warn');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SECTIONS
+// ══════════════════════════════════════════════════════════════════
+const SECTION_LABELS = ['Parte 1 · Tipo test','Parte 2 · Preguntas abiertas','Parte 3 · SQL práctico','Parte 4 · Python'];
+
+function goToSection(idx){
+  state.currentSection = idx;
+  updateDots(idx);
+  updateProgress();
+
+  const main = document.getElementById('test-main');
+  main.innerHTML = '';
+
+  if(idx === 0) renderMC(main);
+  else if(idx === 1) renderOpen(main);
+  else if(idx === 2) renderSQL(main);
+  else if(idx === 3) renderPython(main);
+
+  document.getElementById('nav-info').textContent = SECTION_LABELS[idx] + ' · ' + (idx+1) + ' de 4';
+  document.getElementById('btn-prev').style.display = idx > 0 ? 'block' : 'none';
+  document.getElementById('btn-next').textContent = idx < 3 ? 'Siguiente →' : 'Revisar y enviar →';
+
+  startTimer(state.timers[idx]);
+  window.scrollTo(0,0);
+}
+
+function updateDots(active){
+  for(let i=0;i<4;i++){
+    const d = document.getElementById('dot-'+i);
+    d.className = 'dot';
+    if(i < active) d.classList.add('done');
+    else if(i === active) d.classList.add('active');
+  }
+}
+
+function updateProgress(){
+  const pct = (state.currentSection / 4) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function nextSection(){
+  if(state.currentSection < 3) goToSection(state.currentSection + 1);
+  else showSubmit();
+}
+function prevSection(){
+  if(state.currentSection > 0) goToSection(state.currentSection - 1);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDER — MULTIPLE CHOICE
+// ══════════════════════════════════════════════════════════════════
+function levelBadge(level){
+  return `<span class="badge badge-${level.toLowerCase()}">${level}</span>`;
+}
+
+function renderMC(container){
+  const intro = document.createElement('div');
+  intro.className = 'section-intro';
+  intro.innerHTML = `
+    <div class="section-intro-header">
+      <span class="section-pill pill-test">Tipo test</span>
+      <h2>Preguntas de opción múltiple</h2>
+    </div>
+    <p>Selecciona una única respuesta por pregunta. Sin penalización por respuesta incorrecta.</p>`;
+  container.appendChild(intro);
+
+  const counter = document.createElement('div');
+  counter.className = 'q-counter';
+  counter.id = 'mc-counter';
+  counter.textContent = `0 / ${state.shuffledMC.length} respondidas`;
+  container.appendChild(counter);
+
+  state.shuffledMC.forEach((q, qi) => {
+    const div = document.createElement('div');
+    div.className = 'mc-question' + (state.mcAnswers[q.id] !== undefined ? ' answered' : '');
+    div.id = 'mcq-' + q.id;
+
+    const letters = ['A','B','C','D'];
+    const optsHTML = q.opts.map((opt, oi) => `
+      <div class="mc-option ${state.mcAnswers[q.id]===oi?'selected':''}" onclick="selectMC('${q.id}',${oi})">
+        <span class="opt-letter">${letters[oi]}</span>
+        <span class="opt-text">${opt}</span>
+      </div>`).join('');
+
+    div.innerHTML = `
+      <div class="mc-header">
+        <span class="mc-num">${qi+1}.</span>
+        <div style="flex:1">
+          <div style="margin-bottom:8px">${levelBadge(q.level)}</div>
+          <div class="mc-text">${q.q}</div>
+        </div>
+      </div>
+      <div class="mc-options">${optsHTML}</div>`;
+    container.appendChild(div);
+  });
+}
+
+function selectMC(id, idx){
+  state.mcAnswers[id] = idx;
+  const q = state.shuffledMC.find(q=>q.id===id);
+  const letters = ['A','B','C','D'];
+
+  const container = document.getElementById('mcq-'+id);
+  container.classList.add('answered');
+  container.querySelectorAll('.mc-option').forEach((el, oi) => {
+    el.className = 'mc-option' + (oi===idx?' selected':'');
+  });
+
+  const answered = Object.keys(state.mcAnswers).length;
+  const counter = document.getElementById('mc-counter');
+  if(counter) counter.textContent = `${answered} / ${state.shuffledMC.length} respondidas`;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDER — OPEN QUESTIONS
+// ══════════════════════════════════════════════════════════════════
+function renderOpen(container){
+  const intro = document.createElement('div');
+  intro.className = 'section-intro';
+  intro.innerHTML = `
+    <div class="section-intro-header">
+      <span class="section-pill pill-open">Respuesta libre</span>
+      <h2>Preguntas abiertas</h2>
+    </div>
+    <p>Responde con claridad y concisión. Se valora el razonamiento y el criterio técnico, no la extensión.</p>`;
+  container.appendChild(intro);
+
+  OPEN_QUESTIONS.forEach((q, qi) => {
+    const div = document.createElement('div');
+    div.className = 'open-question';
+
+    const saved = state.openAnswers[q.id] || '';
+    div.innerHTML = `
+      <div class="open-header">
+        <span class="open-num">${qi+1}.</span>
+        <div class="open-content">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            ${levelBadge(q.level)}
+          </div>
+          <div class="open-title">${q.title}</div>
+          <div class="open-text">${q.text}</div>
+        </div>
+      </div>
+      <div class="open-answer">
+        <textarea id="open-${q.id}" placeholder="Escribe tu respuesta aquí..." rows="7">${saved}</textarea>
+        <div class="char-count" id="cc-${q.id}">${saved.length} caracteres</div>
+      </div>`;
+    container.appendChild(div);
+
+    setTimeout(() => {
+      const ta = document.getElementById('open-'+q.id);
+      if(ta){
+        ta.addEventListener('input', () => {
+          state.openAnswers[q.id] = ta.value;
+          document.getElementById('cc-'+q.id).textContent = ta.value.length + ' caracteres';
+        });
+      }
+    }, 0);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDER — SQL
+// ══════════════════════════════════════════════════════════════════
+function renderSQL(container){
+  const intro = document.createElement('div');
+  intro.className = 'section-intro';
+  intro.innerHTML = `
+    <div class="section-intro-header">
+      <span class="section-pill pill-sql">SQL práctico</span>
+      <h2>Ejercicios SQL</h2>
+    </div>
+    <p>Todos los ejercicios usan el esquema de tablas definido a continuación.</p>`;
+  container.appendChild(intro);
+
+  // Schema
+  const schema = document.createElement('div');
+  schema.className = 'schema-box';
+  schema.innerHTML = `
+    <div class="schema-label">Esquema de referencia</div>
+    <pre><span class="c">-- TABLAS DISPONIBLES EN TODOS LOS EJERCICIOS</span>
+
+clientes      (cliente_id INT PK, nombre VARCHAR, ciudad VARCHAR, fecha_alta DATE, segmento VARCHAR)
+productos     (producto_id INT PK, nombre VARCHAR, categoria VARCHAR, precio DECIMAL, activo BOOLEAN)
+pedidos       (pedido_id INT PK, cliente_id INT FK, fecha DATE, estado VARCHAR, canal VARCHAR)
+lineas_pedido (linea_id INT PK, pedido_id INT FK, producto_id INT FK, cantidad INT, precio_unitario DECIMAL)</pre>`;
+  container.appendChild(schema);
+
+  SQL_EXERCISES.forEach((ex, ei) => {
+    const div = document.createElement('div');
+    div.className = 'exercise';
+
+    const typeClass = ex.type==='LECTURA'?'type-read':ex.type==='CORRECCIÓN'?'type-fix':'type-write';
+
+    let answersHTML = (ex.answers||[]).map((a, ai) => {
+      const saved = (state.sqlAnswers[ex.id]||[])[ai] || '';
+      const taClass = a.mono ? '' : 'prose';
+      return `
+        <div class="sub-answer">
+          <div class="sub-answer-label">${a.label}</div>
+          <div class="answer-section">
+            <textarea id="sql-${ex.id}-${ai}" class="${taClass}" placeholder="${a.placeholder}" rows="${a.rows}">${saved}</textarea>
+          </div>
+        </div>`;
+    }).join('');
+
+    div.innerHTML = `
+      <div class="exercise-header">
+        ${levelBadge(ex.level)}
+        <span class="exercise-type ${typeClass}">${ex.type}</span>
+        <span class="exercise-title">${ex.title}</span>
+      </div>
+      <div class="exercise-body">
+        <div class="exercise-prompt">${ex.prompt}</div>
+        ${ex.hint ? `<div class="exercise-hint">💡 ${ex.hint}</div>` : ''}
+        <div class="code-block"><div class="code-label">SQL</div><pre>${escapeHTML(ex.code)}</pre></div>
+        ${answersHTML}
+      </div>`;
+    container.appendChild(div);
+
+    setTimeout(() => {
+      (ex.answers||[]).forEach((a, ai) => {
+        const ta = document.getElementById(`sql-${ex.id}-${ai}`);
+        if(ta){
+          ta.addEventListener('input', () => {
+            if(!state.sqlAnswers[ex.id]) state.sqlAnswers[ex.id] = [];
+            state.sqlAnswers[ex.id][ai] = ta.value;
+          });
+        }
+      });
+    }, 0);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDER — PYTHON
+// ══════════════════════════════════════════════════════════════════
+function renderPython(container){
+  const intro = document.createElement('div');
+  intro.className = 'section-intro';
+  intro.innerHTML = `
+    <div class="section-intro-header">
+      <span class="section-pill pill-python">Python</span>
+      <h2>Lectura de código Python</h2>
+    </div>
+    <p>Para cada fragmento: explica qué hace, identifica problemas en producción y propón mejoras. No se evalúa memorización de APIs.</p>`;
+  container.appendChild(intro);
+
+  PYTHON_EXERCISES.forEach((ex, ei) => {
+    const div = document.createElement('div');
+    div.className = 'exercise';
+
+    let answersHTML = (ex.answers||[]).map((a, ai) => {
+      const saved = (state.pyAnswers[ex.id]||[])[ai] || '';
+      return `
+        <div class="sub-answer">
+          <div class="sub-answer-label">${a.label}</div>
+          <div class="answer-section">
+            <textarea id="py-${ex.id}-${ai}" class="prose" placeholder="${a.placeholder}" rows="${a.rows}">${saved}</textarea>
+          </div>
+        </div>`;
+    }).join('');
+
+    div.innerHTML = `
+      <div class="exercise-header">
+        ${levelBadge(ex.level)}
+        <span class="exercise-type type-read">LECTURA</span>
+        <span class="exercise-title">${ex.title}</span>
+      </div>
+      <div class="exercise-body">
+        <div class="exercise-prompt">${ex.prompt}</div>
+        <div class="code-block"><div class="code-label">Python</div><pre>${escapeHTML(ex.code)}</pre></div>
+        ${answersHTML}
+      </div>`;
+    container.appendChild(div);
+
+    setTimeout(() => {
+      (ex.answers||[]).forEach((a, ai) => {
+        const ta = document.getElementById(`py-${ex.id}-${ai}`);
+        if(ta){
+          ta.addEventListener('input', () => {
+            if(!state.pyAnswers[ex.id]) state.pyAnswers[ex.id] = [];
+            state.pyAnswers[ex.id][ai] = ta.value;
+          });
+        }
+      });
+    }, 0);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SUBMIT
+// ══════════════════════════════════════════════════════════════════
+function showSubmit(){
+  clearInterval(state.timerInterval);
+  updateProgress();
+  document.getElementById('progress-fill').style.width = '95%';
+
+  const mcDone = Object.keys(state.mcAnswers).length;
+  const openDone = OPEN_QUESTIONS.filter(q => (state.openAnswers[q.id]||'').trim().length > 20).length;
+  const sqlDone = SQL_EXERCISES.filter(ex => {
+    const ans = state.sqlAnswers[ex.id] || [];
+    return ans.some(a => (a||'').trim().length > 10);
+  }).length;
+  const pyDone = PYTHON_EXERCISES.filter(ex => {
+    const ans = state.pyAnswers[ex.id] || [];
+    return ans.some(a => (a||'').trim().length > 10);
+  }).length;
+
+  document.getElementById('stat-mc').textContent   = `${mcDone} / ${MC_QUESTIONS.length}`;
+  document.getElementById('stat-open').textContent  = `${openDone} / ${OPEN_QUESTIONS.length}`;
+  document.getElementById('stat-sql').textContent   = `${sqlDone} / ${SQL_EXERCISES.length}`;
+  document.getElementById('stat-py').textContent    = `${pyDone} / ${PYTHON_EXERCISES.length}`;
+
+  const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+  const em = String(Math.floor(elapsed/60)).padStart(2,'0');
+  const es = String(elapsed%60).padStart(2,'0');
+  document.getElementById('stat-time').textContent  = `${em}:${es}`;
+
+  showScreen('screen-submit');
+}
+
+function buildPayload(){
+  // MC: include question text, selected option, correct flag
+  const mcResults = state.shuffledMC.map(q => ({
+    id: q.id, block: q.block, level: q.level,
+    question: q.q,
+    selected: state.mcAnswers[q.id] !== undefined ? q.opts[state.mcAnswers[q.id]] : '(sin respuesta)',
+    correct: state.mcAnswers[q.id] === q.correct,
+    selectedIdx: state.mcAnswers[q.id]
+  }));
+
+  const score = mcResults.filter(r=>r.correct).length;
+
+  const openResults = OPEN_QUESTIONS.map(q => ({
+    id: q.id, level: q.level, title: q.title,
+    answer: state.openAnswers[q.id] || ''
+  }));
+
+  const sqlResults = SQL_EXERCISES.map(ex => ({
+    id: ex.id, level: ex.level, type: ex.type, title: ex.title,
+    answers: (state.sqlAnswers[ex.id] || [])
+  }));
+
+  const pyResults = PYTHON_EXERCISES.map(ex => ({
+    id: ex.id, level: ex.level, title: ex.title,
+    answers: (state.pyAnswers[ex.id] || [])
+  }));
+
+  return {
+    candidate: state.candidate,
+    submittedAt: new Date().toISOString(),
+    tabSwitches: state.tabSwitches,
+    elapsedSeconds: Math.floor((Date.now() - state.startTime) / 1000),
+    mcScore: `${score}/${MC_QUESTIONS.length}`,
+    mcResults,
+    openResults,
+    sqlResults,
+    pyResults,
+  };
+}
+
+async function submitTest(){
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  const payload = buildPayload();
+
+  // ── FORMSPREE ENDPOINT ─────────────────────────────────────────
+  // Replace with your Formspree form ID: https://formspree.io/
+  // Create a free account, create a form, copy the endpoint here.
+  const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mqejoknb';
+
+  // Build a readable text body for Formspree email
+  const mcSummary = payload.mcResults.map((r,i) =>
+    `${i+1}. [${r.correct?'✓':'✗'}] ${r.question}\n   → ${r.selected}`
+  ).join('\n\n');
+
+  const openSummary = payload.openResults.map(r =>
+    `--- ${r.title} [${r.level}] ---\n${r.answer||'(sin respuesta)'}`
+  ).join('\n\n');
+
+  const sqlSummary = payload.sqlResults.map(r =>
+    `--- SQL ${r.type}: ${r.title} [${r.level}] ---\n${(r.answers||[]).join('\n---\n')||'(sin respuesta)'}`
+  ).join('\n\n');
+
+  const pySummary = payload.pyResults.map(r =>
+    `--- PY: ${r.title} [${r.level}] ---\n${(r.answers||[]).join('\n---\n')||'(sin respuesta)'}`
+  ).join('\n\n');
+
+  const formData = new FormData();
+  formData.append('_subject', `Test DE - ${payload.candidate.name} - ${payload.mcScore}`);
+  formData.append('nombre',   payload.candidate.name);
+  formData.append('email',    payload.candidate.email);
+  formData.append('experiencia', payload.candidate.exp);
+  formData.append('enviado_en',  payload.submittedAt);
+  formData.append('tiempo_total', `${Math.floor(payload.elapsedSeconds/60)}min ${payload.elapsedSeconds%60}s`);
+  formData.append('cambios_pestana', payload.tabSwitches);
+  formData.append('puntuacion_test', payload.mcScore);
+  formData.append('respuestas_test', mcSummary);
+  formData.append('respuestas_abiertas', openSummary);
+  formData.append('respuestas_sql', sqlSummary);
+  formData.append('respuestas_python', pySummary);
+
+  try {
+    const res = await fetch(FORMSPREE_ENDPOINT, {
+      method: 'POST',
+      body: formData,
+      headers: { 'Accept': 'application/json' }
+    });
+
+    if(res.ok){
+      document.getElementById('progress-fill').style.width = '100%';
+      showScreen('screen-done');
+      document.getElementById('topbar').style.display = 'none';
+      document.getElementById('progress-bar').style.display = 'none';
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Enviar respuestas ✓';
+      showToast('Error al enviar. Inténtalo de nuevo.');
+    }
+  } catch(e) {
+    // Fallback: if Formspree not configured, still show done
+    // Remove this block in production and keep the error handler
+    console.warn('Formspree not configured, showing done screen anyway');
+    document.getElementById('progress-fill').style.width = '100%';
+    showScreen('screen-done');
+    document.getElementById('topbar').style.display = 'none';
+    document.getElementById('progress-bar').style.display = 'none';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════════
+function escapeHTML(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 </script>
-<!-- ... resto igual ... -->
+</body>
+</html>
