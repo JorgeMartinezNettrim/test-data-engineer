@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
 <style>
 /* ── RESET & TOKENS ─────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -74,6 +75,12 @@ textarea, input[type="text"], input[type="email"] {
   padding: 0 24px;
 }
 .topbar-left { display: flex; align-items: center; gap: 12px; }
+.brand-logo {
+  height: 22px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
 .topbar-logo {
   font-family: var(--mono);
   font-size: 13px;
@@ -163,17 +170,17 @@ textarea, input[type="text"], input[type="email"] {
   letter-spacing: 0.2em;
   color: var(--accentHi);
   text-transform: uppercase;
-  margin-bottom: 32px;
+  margin-bottom: 10px;
 }
-.welcome-title {
-  font-size: clamp(28px, 5vw, 42px);
-  font-weight: 300;
-  color: var(--text);
-  text-align: center;
-  margin-bottom: 8px;
-  letter-spacing: -0.02em;
+.welcome-brand {
+  margin-bottom: 16px;
 }
-.welcome-title strong { font-weight: 600; color: var(--accentHi); }
+.welcome-brand img {
+  width: min(320px, 75vw);
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
 .welcome-subtitle {
   font-size: 15px;
   color: var(--textDim);
@@ -769,6 +776,7 @@ textarea, input[type="text"], input[type="email"] {
 <!-- ── TOP BAR ────────────────────────────────────────────────── -->
 <div class="topbar" id="topbar" style="display:none">
   <div class="topbar-left">
+    <img class="brand-logo" src="https://www.nettrim.es/wp-content/uploads/2022/06/nettrim-technology-blanco.png" alt="Nettrim logo">
     <span class="topbar-logo">DE·TEST</span>
     <span class="topbar-sep">|</span>
     <span class="topbar-candidate" id="topbar-name">—</span>
@@ -795,9 +803,11 @@ textarea, input[type="text"], input[type="email"] {
 ════════════════════════════════════════════════════════════════ -->
 <div class="screen active" id="screen-welcome">
   <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;padding:48px 24px;background:radial-gradient(ellipse at 50% 0%,rgba(37,99,235,0.06) 0%,transparent 70%)">
+    <div class="welcome-brand">
+      <img src="https://www.nettrim.es/wp-content/uploads/2022/06/nettrim-technology-blanco.png" alt="Nettrim logo">
+    </div>
     <div class="welcome-logo">Data Engineering · Technical Assessment</div>
-    <h1 class="welcome-title">Test Técnico<br><strong>Data Engineering</strong></h1>
-    <p class="welcome-subtitle">Microsoft Fabric · SQL · Python · Arquitecturas</p>
+    <p class="welcome-subtitle">SQL · Python · Arquitecturas</p>
 
     <div class="welcome-card">
       <h3>Estructura de la prueba</h3>
