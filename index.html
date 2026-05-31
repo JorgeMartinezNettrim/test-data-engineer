@@ -6,6 +6,7 @@
 <title>Test Técnico · Data Engineering</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
 /* ── RESET & TOKENS ─────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -894,8 +895,9 @@ textarea, input[type="text"], input[type="email"] {
         <span class="value" id="stat-time">—</span>
       </div>
     </div>
-    <div style="display:flex;gap:12px;justify-content:center">
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
       <button class="btn btn-outline" onclick="goToSection(3)">← Revisar</button>
+      <button class="btn btn-outline" onclick="downloadBackupPdf()" id="btn-pdf">Descargar PDF</button>
       <button class="btn btn-primary btn-lg" onclick="submitTest()" id="btn-submit">Enviar respuestas ✓</button>
     </div>
   </div>
@@ -1006,8 +1008,7 @@ const MC_QUESTIONS = [
   { id:'f2', block:'F', level:'Junior', q:"¿Qué es un 'Shortcut' en Microsoft Fabric OneLake?", opts:['Un acceso directo a una dashboard de Power BI','Una referencia a datos en storage externo (S3, ADLS, GCS) que permite leerlos desde Fabric sin moverlos físicamente','Un alias para renombrar tablas dentro del Lakehouse','Un tipo de pipeline optimizado para cargas incrementales'], correct:1 },
   { id:'f3', block:'F', level:'Mid', q:'¿Cuándo es preferible usar Fabric Warehouse frente a Fabric Lakehouse?', opts:['Cuando se necesita procesar datos con PySpark o Python','Cuando el equipo usa SQL puro, necesita DML transaccional (UPDATE/DELETE), o tiene un modelo dimensional clásico tipo Kimball','Cuando los datos son semiestructurados (JSON, XML)','Cuando el volumen supera 1 TB'], correct:1 },
   { id:'f4', block:'F', level:'Mid', q:"¿Qué modo de conectividad usa Power BI en 'Direct Lake' y cuál es su principal limitación?", opts:['Lee Delta Files en OneLake sin importarlos; la limitación es el tope de filas por tabla según el SKU de capacidad, con fallback a DirectQuery','Importa datos al modelo cada hora; la limitación es la latencia','Usa DirectQuery sobre el SQL Endpoint; la limitación es el rendimiento en modelos complejos','Direct Lake no tiene limitaciones; es superior a Import Mode en todos los escenarios'], correct:0 },
-  { id:'f5', block:'F', level:'Senior', q:'En Microsoft Fabric, ¿cómo se gestiona el aislamiento entre entornos (Dev/Test/Prod)?', opts:['Fabric no soporta múltiples entornos','Mediante Deployment Pipelines (Dev→Test→Prod) con integración Git y workspaces separados por entorno','Solo se puede usar un workspace por tenant de Microsoft 365','El aislamiento se gestiona exclusivamente mediante ramas de Git sin herramienta nativa'], correct:1 },
-  { id:'f6', block:'F', level:'Senior', q:"¿Qué implica el 'capacity throttling' en Microsoft Fabric?", opts:['El workspace se pausa automáticamente después de 8 horas','Cuando los workloads consumen más CUs de los asignados, Fabric limita o encola la ejecución; se mitiga separando cargas pesadas en horarios distintos y optimizando jobs','Solo ocurre con capacidades F2 y F4','El throttling elimina datos procesados a medias'], correct:1 },
+  { id:'f5', block:'F', level:'Senior', q:'En Microsoft Fabric, ¿cómo se gestiona el aislamiento entre entornos (Dev/Test/Prod)?', opts:['Fabric no soporta múltiples entornos','Mediante Deployment Pipelines (Dev→Test→Prod) con integración Git y workspaces separados por entorno','Solo se puede usar un workspace por tenant de Microsoft 365','El aislamiento se gestiona exclusivamente mediante ramas de Git sin herramienta nativa'], correct:1 },  
   { 
   id: 'f7', 
   block: 'F', 
@@ -1025,13 +1026,10 @@ const MC_QUESTIONS = [
 
 const OPEN_QUESTIONS = [
   { id:'o1', level:'Junior', title:'Optimización de una consulta SQL lenta', text:'Tienes una tabla de ventas con 50 millones de filas y una consulta SQL que tarda 2 minutos. Describe paso a paso cómo abordarías la optimización.' },
-  { id:'o2', level:'Mid', title:'Pipeline de ingesta incremental', text:'Diseña un pipeline de ingesta incremental desde una base de datos transaccional (PostgreSQL) a un Data Lake. ¿Qué estrategias usarías? ¿Cuáles son sus trade-offs?' },
-  { id:'o3', level:'Mid', title:'Troubleshooting de informe Power BI lento en Fabric', text:'Un Data Analyst te dice que su informe de Power BI tarda 30 segundos en cargar y antes tardaba 3 segundos. El entorno es Microsoft Fabric. ¿Cómo investigarías el problema y qué causas considerarías?' },
-  { id:'o4', level:'Senior', title:'Arquitectura de ingesta multi-fuente en Fabric', text:'Tu empresa quiere consolidar datos de 5 fuentes distintas (2 en AWS, 1 en Azure, 1 on-premise y 1 SaaS) en Microsoft Fabric. ¿Cómo diseñarías la arquitectura de ingesta? ¿Qué riesgos contemplarías?' },
-  { id:'o5', level:'Senior', title:'Migración de Databricks a Microsoft Fabric', text:'¿Cómo convencerías a un equipo técnico experimentado en Databricks de migrar a Microsoft Fabric? ¿Y cuándo NO lo harías? Argumenta con criterio técnico.' },
-  { id:'o6', level:'Mid', title:'Deuda técnica en data engineering', text:'Explica qué es la deuda técnica en un contexto de data engineering. Da un ejemplo concreto de cómo se genera y cómo se aborda.' },
-  { id:'o7', level:'Senior', title:'Estrategia de observabilidad para una data platform', text:'Describe cómo implementarías una estrategia de observabilidad completa para una data platform en producción. ¿Qué monitorizarías y con qué herramientas?' },
-  { id:'o8', level:'Mid', title:'dbt y el patrón ELT moderno', text:'¿Qué es dbt (data build tool) y en qué se diferencia de un pipeline de transformación tradicional con Spark o SQL scripts?' },
+  { id:'o2', level:'Mid', title:'Pipeline de ingesta incremental', text:'Diseña un pipeline de ingesta incremental desde una base de datos transaccional (PostgreSQL) a un Data Lake. ¿Qué estrategias usarías? ¿Cuáles son sus trade-offs ("pros y contras"?' },
+  { id:'o3', level:'Mid', title:'Troubleshooting de informe Power BI lento en Fabric', text:'Un Data Analyst te dice que su informe de Power BI tarda 30 segundos en cargar y antes tardaba 3 segundos. El entorno es Microsoft Fabric. ¿Cómo investigarías el problema y qué causas considerarías?' },  
+  { id:'o4', level:'Mid', title:'Deuda técnica en data engineering', text:'Explica qué es la deuda técnica en un contexto de data engineering. Da un ejemplo concreto de cómo se genera y cómo se aborda.' },  
+  { id:'o5', level:'Mid', title:'dbt y el patrón ELT moderno', text:'¿Qué es dbt (data build tool) y en qué se diferencia de un pipeline de transformación tradicional con Spark o SQL scripts?' },
 ];
 
 const SQL_EXERCISES = [
@@ -1788,12 +1786,115 @@ function buildPayload(){
   };
 }
 
+function sanitizeFileName(value){
+  return String(value || 'candidato')
+    .replace(/[^\w\-]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 80) || 'candidato';
+}
+
+function addWrappedText(doc, text, margin, maxWidth, yObj, lineHeight){
+  const lines = doc.splitTextToSize(String(text || ''), maxWidth);
+  for(let i = 0; i < lines.length; i++){
+    if(yObj.value > 790){
+      doc.addPage();
+      yObj.value = 50;
+    }
+    doc.text(lines[i], margin, yObj.value);
+    yObj.value += lineHeight;
+  }
+}
+
+function downloadBackupPdf(){
+  const payload = buildPayload();
+  const jspdfNs = window.jspdf;
+
+  if(!jspdfNs || !jspdfNs.jsPDF){
+    showToast('No se pudo generar el PDF (librería no cargada).');
+    return;
+  }
+
+  const { jsPDF } = jspdfNs;
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const margin = 40;
+  const maxWidth = doc.internal.pageSize.getWidth() - margin * 2;
+  const y = { value: 50 };
+  const lineHeight = 14;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('Backup respuestas - Test Data Engineering', margin, y.value);
+  y.value += 22;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  addWrappedText(doc, 'Nombre: ' + payload.candidate.name, margin, maxWidth, y, lineHeight);
+  addWrappedText(doc, 'Email: ' + payload.candidate.email, margin, maxWidth, y, lineHeight);
+  addWrappedText(doc, 'Experiencia: ' + payload.candidate.exp, margin, maxWidth, y, lineHeight);
+  addWrappedText(doc, 'Fecha: ' + payload.submittedAt, margin, maxWidth, y, lineHeight);
+  addWrappedText(doc, 'Puntuacion test: ' + payload.mcScore, margin, maxWidth, y, lineHeight);
+  addWrappedText(doc, 'Cambios de pestana: ' + payload.tabSwitches, margin, maxWidth, y, lineHeight);
+  y.value += 8;
+
+  doc.setFont('helvetica', 'bold');
+  addWrappedText(doc, 'TEST TIPO TEST', margin, maxWidth, y, lineHeight);
+  doc.setFont('helvetica', 'normal');
+  payload.mcResults.forEach((r, i) => {
+    addWrappedText(doc, (i + 1) + '. ' + r.question, margin, maxWidth, y, lineHeight);
+    addWrappedText(doc, 'Respuesta: ' + r.selected, margin, maxWidth, y, lineHeight);
+    y.value += 6;
+  });
+
+  doc.setFont('helvetica', 'bold');
+  addWrappedText(doc, 'PREGUNTAS ABIERTAS', margin, maxWidth, y, lineHeight);
+  doc.setFont('helvetica', 'normal');
+  payload.openResults.forEach((r, i) => {
+    addWrappedText(doc, (i + 1) + '. ' + r.title, margin, maxWidth, y, lineHeight);
+    addWrappedText(doc, r.answer || '(sin respuesta)', margin, maxWidth, y, lineHeight);
+    y.value += 6;
+  });
+
+  doc.setFont('helvetica', 'bold');
+  addWrappedText(doc, 'SQL', margin, maxWidth, y, lineHeight);
+  doc.setFont('helvetica', 'normal');
+  payload.sqlResults.forEach((r, i) => {
+    addWrappedText(doc, (i + 1) + '. ' + r.title + ' [' + r.type + ']', margin, maxWidth, y, lineHeight);
+    (r.answers || []).forEach((ans, j) => {
+      addWrappedText(doc, 'Parte ' + (j + 1) + ': ' + (ans || '(sin respuesta)'), margin, maxWidth, y, lineHeight);
+    });
+    y.value += 6;
+  });
+
+  doc.setFont('helvetica', 'bold');
+  addWrappedText(doc, 'PYTHON', margin, maxWidth, y, lineHeight);
+  doc.setFont('helvetica', 'normal');
+  payload.pyResults.forEach((r, i) => {
+    addWrappedText(doc, (i + 1) + '. ' + r.title, margin, maxWidth, y, lineHeight);
+    (r.answers || []).forEach((ans, j) => {
+      addWrappedText(doc, 'Parte ' + (j + 1) + ': ' + (ans || '(sin respuesta)'), margin, maxWidth, y, lineHeight);
+    });
+    y.value += 6;
+  });
+
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const fileName = 'backup_test_' + sanitizeFileName(payload.candidate.name) + '_' + stamp + '.pdf';
+  doc.save(fileName);
+  showToast('PDF descargado correctamente');
+}
+
 async function submitTest(){
+
   const btn = document.getElementById('btn-submit');
   btn.disabled = true;
   btn.textContent = 'Enviando...';
 
   const payload = buildPayload();
+  // Descargar PDF automáticamente antes de enviar
+  try {
+    downloadBackupPdf();
+  } catch (e) {
+    console.warn('No se pudo generar PDF antes del envío', e);
+  }
 
   // ── FORMSPREE ENDPOINT ─────────────────────────────────────────
   // Replace with your Formspree form ID: https://formspree.io/
