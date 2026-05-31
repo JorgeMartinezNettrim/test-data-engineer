@@ -6,6 +6,8 @@
 <title>Test Técnico · Data Engineering</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
 <style>
 /* ── RESET & TOKENS ─────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -73,6 +75,12 @@ textarea, input[type="text"], input[type="email"] {
   padding: 0 24px;
 }
 .topbar-left { display: flex; align-items: center; gap: 12px; }
+.brand-logo {
+  height: 22px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
 .topbar-logo {
   font-family: var(--mono);
   font-size: 13px;
@@ -162,17 +170,17 @@ textarea, input[type="text"], input[type="email"] {
   letter-spacing: 0.2em;
   color: var(--accentHi);
   text-transform: uppercase;
-  margin-bottom: 32px;
+  margin-bottom: 10px;
 }
-.welcome-title {
-  font-size: clamp(28px, 5vw, 42px);
-  font-weight: 300;
-  color: var(--text);
-  text-align: center;
-  margin-bottom: 8px;
-  letter-spacing: -0.02em;
+.welcome-brand {
+  margin-bottom: 16px;
 }
-.welcome-title strong { font-weight: 600; color: var(--accentHi); }
+.welcome-brand img {
+  width: min(320px, 75vw);
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
 .welcome-subtitle {
   font-size: 15px;
   color: var(--textDim);
@@ -768,6 +776,7 @@ textarea, input[type="text"], input[type="email"] {
 <!-- ── TOP BAR ────────────────────────────────────────────────── -->
 <div class="topbar" id="topbar" style="display:none">
   <div class="topbar-left">
+    <img class="brand-logo" src="https://www.nettrim.es/wp-content/uploads/2022/06/nettrim-technology-blanco.png" alt="Nettrim logo">
     <span class="topbar-logo">DE·TEST</span>
     <span class="topbar-sep">|</span>
     <span class="topbar-candidate" id="topbar-name">—</span>
@@ -794,29 +803,16 @@ textarea, input[type="text"], input[type="email"] {
 ════════════════════════════════════════════════════════════════ -->
 <div class="screen active" id="screen-welcome">
   <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;padding:48px 24px;background:radial-gradient(ellipse at 50% 0%,rgba(37,99,235,0.06) 0%,transparent 70%)">
+    <div class="welcome-brand">
+      <img src="https://www.nettrim.es/wp-content/uploads/2022/06/nettrim-technology-blanco.png" alt="Nettrim logo">
+    </div>
     <div class="welcome-logo">Data Engineering · Technical Assessment</div>
-    <h1 class="welcome-title">Test Técnico<br><strong>Data Engineering</strong></h1>
-    <p class="welcome-subtitle">Microsoft Fabric · SQL · Python · Arquitecturas</p>
+    <p class="welcome-subtitle">SQL · Python · Arquitecturas</p>
 
     <div class="welcome-card">
       <h3>Estructura de la prueba</h3>
-      <div class="info-grid">
-        <div class="info-item">
-          <div class="label">Parte 1</div>
-          <div class="value">35 preguntas tipo test</div>
-        </div>
-        <div class="info-item">
-          <div class="label">Parte 2</div>
-          <div class="value">8 preguntas abiertas</div>
-        </div>
-        <div class="info-item">
-          <div class="label">Parte 3</div>
-          <div class="value">6 ejercicios SQL</div>
-        </div>
-        <div class="info-item">
-          <div class="label">Parte 4</div>
-          <div class="value">4 snippets Python</div>
-        </div>
+      <div class="info-grid" id="info-grid-dynamic">
+        <!-- Los totales se rellenan dinámicamente por JS -->
       </div>
       <ul class="rules-list">
         <li>Cada parte tiene su propio temporizador orientativo</li>
@@ -871,6 +867,9 @@ textarea, input[type="text"], input[type="email"] {
   <div style="width:100%;max-width:520px">
     <h2>Revisar y enviar</h2>
     <p>Comprueba el resumen antes de enviar. Una vez enviado no podrás modificar las respuestas.</p>
+    <p style="color:var(--orange);font-size:13px;margin:0 auto 20px;max-width:480px">
+      Importante: descarga el PDF de backup al terminar la prueba y guárdalo como respaldo de tus respuestas.
+    </p>
     <div class="submit-card">
       <h3>Resumen de respuestas</h3>
       <div class="submit-stat">
@@ -894,8 +893,9 @@ textarea, input[type="text"], input[type="email"] {
         <span class="value" id="stat-time">—</span>
       </div>
     </div>
-    <div style="display:flex;gap:12px;justify-content:center">
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
       <button class="btn btn-outline" onclick="goToSection(3)">← Revisar</button>
+      <button class="btn btn-outline" onclick="downloadBackupPdf()" id="btn-pdf">Descargar PDF</button>
       <button class="btn btn-primary btn-lg" onclick="submitTest()" id="btn-submit">Enviar respuestas ✓</button>
     </div>
   </div>
@@ -916,30 +916,52 @@ textarea, input[type="text"], input[type="email"] {
 </div>
 
 <script>
+
 // ══════════════════════════════════════════════════════════════
 // QUESTION DATA
 // ══════════════════════════════════════════════════════════════
 
 const MC_QUESTIONS = [
   // BLOQUE A — SQL
-  { id:'a1', block:'A', level:'Junior', q:'¿Cuál de las siguientes sentencias SQL devuelve solo las filas que tienen coincidencia en AMBAS tablas?', opts:['LEFT JOIN','INNER JOIN','FULL OUTER JOIN','CROSS JOIN'], correct:1 },
-  { id:'a2', block:'A', level:'Junior', q:'¿Qué hace la cláusula GROUP BY en SQL?', opts:['Ordena los resultados por columna','Agrupa filas con el mismo valor en una o más columnas','Filtra filas después de un JOIN','Elimina duplicados de la consulta'], correct:1 },
-  { id:'a3', block:'A', level:'Mid', q:'En un modelo dimensional, ¿cuál es la diferencia principal entre Star Schema y Snowflake Schema?', opts:['El Star Schema normaliza las dimensiones; el Snowflake no','El Snowflake normaliza las dimensiones en sub-tablas; el Star las desnormaliza','El Star Schema solo soporta una tabla de hechos','El Snowflake Schema no soporta dimensiones de tiempo'], correct:1 },
+  { id: 'a1b', block: 'A', level: 'Mid', q: 'Tienes una tabla de ventas con millones de registros. ¿Cuál sería la consulta SQL óptima para calcular el monto total de ventas por cliente durante el último año, incluyendo solo aquellos clientes cuyos pedidos superan los 1000€ en total?', opts: [
+  'Usar GROUP BY cliente_id y un HAVING SUM(monto) > 1000, filtrando por fecha en el WHERE',
+  'Agrupar por fecha y sumar los pedidos, luego filtrar clientes en el SELECT',
+  'Hacer un JOIN con la tabla de clientes y filtrar en el SELECT',
+  'Usar una subconsulta para traer todos los pedidos y luego agrupar'
+]},
+{ id: 'a2b', block: 'A', level: 'Mid', q: 'En una base de datos analítica, necesitas calcular el ranking de ingresos por producto para cada país. ¿Qué función SQL utilizarías y cómo sería el approach?', opts: [
+  'Usar la función RANK() OVER (PARTITION BY pais ORDER BY ingresos DESC)',
+  'Hacer un JOIN de todas las tablas y agrupar por país y producto',
+  'Utilizar la función SUM() en una subconsulta',
+  'RANK() OVER (ORDER BY producto)'
+]},
+  
+  
   { id:'a4', block:'A', level:'Mid', q:'¿Qué tipo de Slowly Changing Dimension (SCD) añade una nueva fila cuando un atributo cambia, preservando el historial?', opts:['SCD Tipo 0','SCD Tipo 1','SCD Tipo 2','SCD Tipo 3'], correct:2 },
   { id:'a5', block:'A', level:'Senior', q:'¿Cuál es la estrategia más eficiente para calcular totales acumulados (running totals) sobre millones de filas en un warehouse columnar?', opts:['Subconsulta correlacionada con SUM sobre todas las filas anteriores','Función de ventana: SUM() OVER (ORDER BY fecha ROWS UNBOUNDED PRECEDING)','Cursor iterando fila a fila','Tabla temporal con los totales + JOIN'], correct:1 },
   { id:'a6', block:'A', level:'Senior', q:"En un data warehouse de gran volumen, ¿qué es la 'partition pruning' y cuándo ocurre?", opts:['Eliminar columnas redundantes de la tabla de hechos','El motor salta particiones que no pueden contener datos relevantes para el filtro aplicado','Comprimir las particiones más antiguas automáticamente','Dividir una partición grande en varias más pequeñas'], correct:1 },
   // BLOQUE B — Arquitecturas
-  { id:'b1', block:'B', level:'Junior', q:'¿Qué diferencia un Data Lake de un Data Warehouse?', opts:['El Data Lake solo almacena datos relacionales; el DWH acepta cualquier formato','El Data Lake almacena datos en formato raw sin estructura fija; el DWH almacena datos estructurados y modelados','El Data Warehouse es más barato de mantener','No hay diferencia relevante, son sinónimos modernos'], correct:1 },
-  { id:'b2', block:'B', level:'Junior', q:'En una arquitectura medallion (Bronze/Silver/Gold), ¿qué contiene la capa Bronze?', opts:['Datos agregados listos para consumo de negocio','Datos limpios y normalizados','Datos raw tal como llegan de la fuente, sin transformar','Modelos de Machine Learning entrenados'], correct:2 },
-  { id:'b3', block:'B', level:'Mid', q:'¿Cuál es la principal ventaja del patrón Lambda Architecture frente a procesar todo en batch?', opts:['Elimina completamente el procesamiento batch','Combina batch (alta precisión, alta latencia) con streaming (baja latencia, aproximados) para respuestas en tiempo real','Es más sencillo de implementar que un pipeline batch puro','Solo funciona con datos estructurados'], correct:1 },
+  { 
+  id: 'b1', 
+  block: 'B', 
+  level: 'Junior', 
+  q: '¿Cuál es la principal evolución que introduce el modelo Data Lakehouse frente a la arquitectura tradicional de Data Lake y Data Warehouse?', 
+  opts: [
+    'Elimina la necesidad de usar SQL, obligando a procesar todos los datos mediante archivos de texto plano.', 
+    'Implementa una capa de metadatos y transacciones (como Delta Lake o Iceberg) sobre un Data Lake, permitiendo ACID, gobernanza y rendimiento de Warehouse sobre datos económicos en la nube.', 
+    'Es una base de datos puramente relacional que prohíbe el almacenamiento de datos no estructurados como imágenes o JSON.', 
+    'Funciona exclusivamente en servidores on-premise para garantizar la seguridad física de los datos estructurados.'
+  ], 
+  correct: 1 
+},
+  { id:'b2', block:'B', level:'Junior', q:'En una arquitectura medallion (Bronze/Silver/Gold), ¿qué contiene la capa Bronze?', opts:['Datos agregados listos para consumo de negocio','Datos limpios y normalizados','Datos raw tal como llegan de la fuente, sin transformar','Modelos de Machine Learning entrenados'], correct:2 },  
   { id:'b4', block:'B', level:'Mid', q:"¿Qué es un 'data lakehouse' y qué problema resuelve frente al data lake tradicional?", opts:['Un data lake con más capacidad de almacenamiento','Un DWH migrado a cloud sin cambios','Arquitectura que añade ACID, schema enforcement y rendimiento analítico sobre el storage del data lake','Un sistema que reemplaza el data lake por un warehouse columnar'], correct:2 },
   { id:'b5', block:'B', level:'Senior', q:"En streaming, ¿cuál es la diferencia entre 'event time' y 'processing time'?", opts:['Son sinónimos; solo el nombre cambia según el framework','Event time es cuándo ocurrió el evento en la fuente; processing time es cuándo llega al sistema. Importa por los eventos desordenados y late data','Event time solo aplica a datos IoT','Processing time siempre es mayor que event time'], correct:1 },
   { id:'b6', block:'B', level:'Senior', q:'¿Qué garantías de consistencia ofrece Delta Lake frente a Parquet puro?', opts:['Delta ofrece mayor compresión','Delta añade ACID, time travel, schema enforcement y DML (UPDATE/DELETE/MERGE)','Parquet tiene soporte transaccional nativo; Delta solo añade índices','Delta Lake solo funciona con Spark'], correct:1 },
   // BLOQUE C — Orquestación
   { id:'c1', block:'C', level:'Junior', q:'¿Qué es un DAG en el contexto de Apache Airflow?', opts:['Una base de datos optimizada para grafos','Un Directed Acyclic Graph: define tareas de un workflow y sus dependencias sin ciclos','Un contenedor Docker para ejecutar pipelines','Un formato YAML para configurar pipelines'], correct:1 },
   { id:'c2', block:'C', level:'Junior', q:'¿Cuál describe mejor el concepto de idempotencia en un pipeline de datos?', opts:['El pipeline se ejecuta automáticamente si falla','Ejecutar el pipeline múltiples veces con el mismo input produce siempre el mismo resultado sin efectos secundarios','El pipeline procesa datos en orden estrictamente cronológico','El pipeline puede ejecutarse en paralelo sin coordinación'], correct:1 },
-  { id:'c3', block:'C', level:'Mid', q:"¿Cuál es la diferencia entre un trigger de tipo 'schedule' y uno de tipo 'sensor' en Airflow?", opts:["El schedule ejecuta en base a tiempo; el sensor espera a que una condición externa se cumpla (ej: que exista un fichero)",'El sensor es más rápido que el schedule','Son sinónimos en Airflow moderno','El sensor solo funciona con bases de datos; el schedule con ficheros'], correct:0 },
-  { id:'c4', block:'C', level:'Mid', q:'¿Qué estrategia de re-ejecución parcial permite Airflow cuando un paso intermedio falla?', opts:['Reiniciar siempre desde el primer paso','Clear y re-run de las tareas fallidas y sus descendientes, manteniendo el estado de las tareas exitosas','Airflow no soporta re-ejecución parcial','Solo se puede re-ejecutar el último paso'], correct:1 },
+  { id:'c3', block:'C', level:'Mid', q:"¿Cuál es la diferencia entre un trigger de tipo 'schedule' y uno de tipo 'sensor' en Airflow?", opts:["El schedule ejecuta en base a tiempo; el sensor espera a que una condición externa se cumpla (ej: que exista un fichero)",'El sensor es más rápido que el schedule','Son sinónimos en Airflow moderno','El sensor solo funciona con bases de datos; el schedule con ficheros'], correct:0 },  
   { id:'c5', block:'C', level:'Senior', q:'¿Cuál es la afirmación correcta sobre ELT frente a ETL en cloud data platforms?', opts:['ELT es siempre más rápido independientemente del volumen','ETL transforma antes de cargar; ELT carga en crudo y transforma dentro del warehouse aprovechando su cómputo','ELT elimina la necesidad de orquestación','ETL es la única opción válida para streaming'], correct:1 },
   { id:'c6', block:'C', level:'Senior', q:"¿Qué problema resuelve el concepto de 'backfill' en Airflow?", opts:['Llenar el storage cuando está casi lleno','Ejecutar runs de DAG para intervalos de tiempo pasados que no se procesaron en su momento','Revertir cambios en la base de datos de metadatos','Precalentar la caché de resultados'], correct:1 },
   // BLOQUE D — Cloud
@@ -947,32 +969,38 @@ const MC_QUESTIONS = [
   { id:'d2', block:'D', level:'Junior', q:"¿Qué significa que un servicio cloud sea 'serverless' en data engineering?", opts:['No tiene servidor físico; los datos se almacenan en la nube de otro proveedor','No requiere aprovisionar ni gestionar infraestructura; el proveedor escala automáticamente y se factura por uso real','Es gratuito para cargas pequeñas','Solo funciona sin conexión a internet'], correct:1 },
   { id:'d3', block:'D', level:'Mid', q:'En AWS, ¿cuál es la diferencia entre S3 Standard, S3 Intelligent-Tiering y S3 Glacier?', opts:['Solo difieren en el límite de tamaño de objeto','Standard: acceso frecuente; Intelligent-Tiering: mueve objetos según patrón de acceso; Glacier: archivado, latencia alta, coste muy bajo','Intelligent-Tiering y Glacier son sinónimos','Standard es la única opción con 11 nueves de durabilidad'], correct:1 },
   { id:'d4', block:'D', level:'Mid', q:"¿Qué es el 'egress cost' en cloud y por qué es relevante en arquitecturas multi-cloud?", opts:['El coste de ingestar datos desde fuentes externas','El coste de transferir datos fuera de la región o proveedor; puede ser significativo al mover grandes volúmenes entre clouds o hacia on-premise','El coste de almacenamiento de datos temporales','No existe en proveedores enterprise con contrato'], correct:1 },
-  { id:'d5', block:'D', level:'Senior', q:'En Kubernetes (EKS/AKS/GKE), ¿cuál es la ventaja de Karpenter frente al Cluster Autoscaler clásico?', opts:['Karpenter solo funciona en AWS','Karpenter provisiona nodos con los tipos de instancia óptimos para cada pod sin depender de node groups predefinidos, siendo más rápido y flexible','Cluster Autoscaler es más rápido porque usa node groups preconfigurados','No hay diferencia funcional'], correct:1 },
+  { 
+  id: 'd5', 
+  block: 'D', 
+  level: 'Senior', 
+  q: 'En entornos de computación distribuida (como Apache Spark), ¿cuál es la estrategia más eficiente para mitigar el impacto del "Data Skew" (sesgo de datos) durante una operación de JOIN de gran volumen?', 
+  opts: [
+    'Incrementar linealmente el número de ejecutores en el clúster hasta que el nodo rezagado tenga suficiente memoria RAM para procesar su partición.', 
+    'Implementar técnicas de "Salting", añadiendo una clave aleatoria a los datos sesgados para redistribuirlos uniformemente entre múltiples particiones y evitar nodos cuello de botella.', 
+    'Deshabilitar el "Adaptive Query Execution" (AQE) para forzar al planificador a utilizar un tamaño de partición estático e idéntico para todas las tareas.', 
+    'Convertir la operación de JOIN en un "Broadcast Hash JOIN" sin importar el tamaño de la tabla más grande para evitar la fase de Shuffle.'
+  ], 
+  correct: 1 
+},
   // BLOQUE E — Calidad
   { id:'e1', block:'E', level:'Junior', q:'¿Cuál de estas métricas NO es una dimensión estándar de calidad de datos?', opts:['Completitud (no hay valores nulos inesperados)','Unicidad (no hay duplicados)','Velocidad de ingesta (tiempo de carga)','Consistencia (valores coherentes entre sistemas)'], correct:2 },
   { id:'e2', block:'E', level:'Junior', q:'¿Qué es el linaje de datos (data lineage)?', opts:['Un log de todos los usuarios que han accedido a un dataset','El registro del origen de los datos y todas las transformaciones que han sufrido desde la fuente hasta el destino final','Un índice para acelerar consultas sobre tablas grandes','La política de retención de datos de una organización'], correct:1 },
   { id:'e3', block:'E', level:'Mid', q:'¿Qué diferencia un catálogo de datos de un diccionario de datos?', opts:['Son exactamente lo mismo con distinto nombre','El diccionario define el significado técnico de campos; el catálogo añade descubrimiento, linaje, métricas de calidad, clasificación y colaboración','El catálogo solo cubre datos estructurados','El diccionario es una funcionalidad dentro del catálogo'], correct:1 },
-  { id:'e4', block:'E', level:'Mid', q:"En el contexto del RGPD, ¿qué implica el derecho al olvido para un data engineer?", opts:['Solo afecta a los equipos legales','Debe implementar mecanismos para eliminar o anonimizar datos personales en todos los sistemas, incluyendo backups y datos históricos','Basta con eliminar el registro de la BD de producción','Solo aplica a datos almacenados en Europa'], correct:1 },
-  { id:'e5', block:'E', level:'Senior', q:'¿Cuál es el principal riesgo de implementar RLS solo en la capa de reporting (Power BI, Tableau) en lugar de en la capa de datos?', opts:['El RLS en reporting es más difícil de configurar','Si los usuarios acceden por otras vías (APIs, SQL directo, exports), el RLS de reporting no aplica y los datos quedan desprotegidos','El RLS en reporting tiene peor rendimiento','No hay riesgo diferencial; son equivalentes en seguridad'], correct:1 },
+  
   // BLOQUE F — Fabric
   { id:'f1', block:'F', level:'Junior', q:'¿Cuál es el formato de almacenamiento nativo de las tablas en un Microsoft Fabric Lakehouse?', opts:['CSV comprimido con GZIP','Apache Parquet sin gestión transaccional','Delta Lake (Delta Parquet con transaction log)','ORC (Optimized Row Columnar)'], correct:2 },
   { id:'f2', block:'F', level:'Junior', q:"¿Qué es un 'Shortcut' en Microsoft Fabric OneLake?", opts:['Un acceso directo a una dashboard de Power BI','Una referencia a datos en storage externo (S3, ADLS, GCS) que permite leerlos desde Fabric sin moverlos físicamente','Un alias para renombrar tablas dentro del Lakehouse','Un tipo de pipeline optimizado para cargas incrementales'], correct:1 },
   { id:'f3', block:'F', level:'Mid', q:'¿Cuándo es preferible usar Fabric Warehouse frente a Fabric Lakehouse?', opts:['Cuando se necesita procesar datos con PySpark o Python','Cuando el equipo usa SQL puro, necesita DML transaccional (UPDATE/DELETE), o tiene un modelo dimensional clásico tipo Kimball','Cuando los datos son semiestructurados (JSON, XML)','Cuando el volumen supera 1 TB'], correct:1 },
   { id:'f4', block:'F', level:'Mid', q:"¿Qué modo de conectividad usa Power BI en 'Direct Lake' y cuál es su principal limitación?", opts:['Lee Delta Files en OneLake sin importarlos; la limitación es el tope de filas por tabla según el SKU de capacidad, con fallback a DirectQuery','Importa datos al modelo cada hora; la limitación es la latencia','Usa DirectQuery sobre el SQL Endpoint; la limitación es el rendimiento en modelos complejos','Direct Lake no tiene limitaciones; es superior a Import Mode en todos los escenarios'], correct:0 },
-  { id:'f5', block:'F', level:'Senior', q:'En Microsoft Fabric, ¿cómo se gestiona el aislamiento entre entornos (Dev/Test/Prod)?', opts:['Fabric no soporta múltiples entornos','Mediante Deployment Pipelines (Dev→Test→Prod) con integración Git y workspaces separados por entorno','Solo se puede usar un workspace por tenant de Microsoft 365','El aislamiento se gestiona exclusivamente mediante ramas de Git sin herramienta nativa'], correct:1 },
-  { id:'f6', block:'F', level:'Senior', q:"¿Qué implica el 'capacity throttling' en Microsoft Fabric?", opts:['El workspace se pausa automáticamente después de 8 horas','Cuando los workloads consumen más CUs de los asignados, Fabric limita o encola la ejecución; se mitiga separando cargas pesadas en horarios distintos y optimizando jobs','Solo ocurre con capacidades F2 y F4','El throttling elimina datos procesados a medias'], correct:1 },
-  { id:'f7', block:'F', level:'Senior', q:'¿Cuál es la diferencia entre OneLake Data Access Roles y Workspace Roles en Fabric?', opts:['Son el mismo mecanismo con distinto nombre','Workspace Roles controlan acceso a artefactos del workspace; OneLake Data Access Roles permiten control granular a nivel de carpeta o tabla dentro del lakehouse','OneLake Data Access Roles solo aplican a shortcuts externos','Workspace Roles son más granulares'], correct:1 },
+  { id:'f5', block:'F', level:'Senior', q:'En Microsoft Fabric, ¿cómo se gestiona el aislamiento entre entornos (Dev/Test/Prod)?', opts:['Fabric no soporta múltiples entornos','Mediante Deployment Pipelines (Dev→Test→Prod) con integración Git y workspaces separados por entorno','Solo se puede usar un workspace por tenant de Microsoft 365','El aislamiento se gestiona exclusivamente mediante ramas de Git sin herramienta nativa'], correct:1 },  
+  
 ];
 
 const OPEN_QUESTIONS = [
-  { id:'o1', level:'Junior', title:'Optimización de una consulta SQL lenta', text:'Tienes una tabla de ventas con 50 millones de filas y una consulta SQL que tarda 2 minutos. Describe paso a paso cómo abordarías la optimización.' },
-  { id:'o2', level:'Mid', title:'Pipeline de ingesta incremental', text:'Diseña un pipeline de ingesta incremental desde una base de datos transaccional (PostgreSQL) a un Data Lake. ¿Qué estrategias usarías? ¿Cuáles son sus trade-offs?' },
-  { id:'o3', level:'Mid', title:'Troubleshooting de informe Power BI lento en Fabric', text:'Un Data Analyst te dice que su informe de Power BI tarda 30 segundos en cargar y antes tardaba 3 segundos. El entorno es Microsoft Fabric. ¿Cómo investigarías el problema y qué causas considerarías?' },
-  { id:'o4', level:'Senior', title:'Arquitectura de ingesta multi-fuente en Fabric', text:'Tu empresa quiere consolidar datos de 5 fuentes distintas (2 en AWS, 1 en Azure, 1 on-premise y 1 SaaS) en Microsoft Fabric. ¿Cómo diseñarías la arquitectura de ingesta? ¿Qué riesgos contemplarías?' },
-  { id:'o5', level:'Senior', title:'Migración de Databricks a Microsoft Fabric', text:'¿Cómo convencerías a un equipo técnico experimentado en Databricks de migrar a Microsoft Fabric? ¿Y cuándo NO lo harías? Argumenta con criterio técnico.' },
-  { id:'o6', level:'Mid', title:'Deuda técnica en data engineering', text:'Explica qué es la deuda técnica en un contexto de data engineering. Da un ejemplo concreto de cómo se genera y cómo se aborda.' },
-  { id:'o7', level:'Senior', title:'Estrategia de observabilidad para una data platform', text:'Describe cómo implementarías una estrategia de observabilidad completa para una data platform en producción. ¿Qué monitorizarías y con qué herramientas?' },
-  { id:'o8', level:'Mid', title:'dbt y el patrón ELT moderno', text:'¿Qué es dbt (data build tool) y en qué se diferencia de un pipeline de transformación tradicional con Spark o SQL scripts?' },
+  { id:'o1', level:'Junior', title:'Optimización de una consulta SQL lenta', text:'Tienes una tabla de ventas con 50 millones de filas y una consulta SQL que tarda 2 minutos. Describe paso a paso cómo abordarías la optimización.' },  
+  { id:'o2', level:'Mid', title:'Gestión de incidencias en proyectos de datos', text:'Imagina que un pipeline crítico de datos falla en producción y deja de cargar información para los dashboards de negocio. ¿Cómo abordarías la investigación y resolución del problema? Explica los pasos que seguirías y cómo comunicarías la situación a los equipos afectados.' },  
+  { id:'o3', level:'Mid', title:'dbt y el patrón ELT moderno', text:'¿Qué es dbt (data build tool) y en qué se diferencia de un pipeline de transformación tradicional con Spark o SQL scripts?' },
+  { id:'o4', level:'Mid', title:'Pipeline de ingesta incremental', text:'Diseña un pipeline de ingesta incremental desde una base de datos transaccional (PostgreSQL) a un Data Lake. ¿Qué estrategias usarías? ' },  
 ];
 
 const SQL_EXERCISES = [
@@ -1079,174 +1107,110 @@ WHERE p.estado != 'cancelado';`,
 
 const PYTHON_EXERCISES = [
   {
-    id:'p1', level:'Junior', title:'Carga y transformación básica con pandas',
-    prompt:'Explica qué hace este script paso a paso. ¿Hay algún problema potencial si se usa en producción?',
+    id:'p1', level:'Junior', title:'¿Qué hace esta función?',
+    prompt:'Lee el siguiente código y explica qué hace paso a paso. ¿Hay algo que mejorarías?',
     code:`import pandas as pd
 
-def procesar_pedidos(ruta_fichero: str) -> pd.DataFrame:
-    df = pd.read_csv(ruta_fichero)
+def resumen_ventas(ruta: str) -> pd.DataFrame:
+    df = pd.read_csv(ruta)
 
-    df['fecha']   = pd.to_datetime(df['fecha'])
     df['importe'] = df['cantidad'] * df['precio_unitario']
 
-    df = df[df['estado'] != 'cancelado']
+    df = df[df['importe'] > 0]
 
-    resumen = df.groupby('cliente_id').agg(
-        total_pedidos  = ('pedido_id', 'nunique'),
-        importe_total  = ('importe',   'sum'),
-        primera_compra = ('fecha',     'min'),
-        ultima_compra  = ('fecha',     'max'),
+    resultado = df.groupby('categoria').agg(
+        total_ventas = ('importe', 'sum'),
+        num_pedidos  = ('pedido_id', 'count'),
     ).reset_index()
 
-    resumen['ticket_medio'] = (
-        resumen['importe_total'] / resumen['total_pedidos']
+    resultado['ticket_medio'] = (
+        resultado['total_ventas'] / resultado['num_pedidos']
     )
 
-    return resumen.sort_values('importe_total', ascending=False)`,
+    return resultado.sort_values('total_ventas', ascending=False)`,
     answers:[
-      { label:'¿Qué hace? Explica cada bloque', placeholder:'Explica paso a paso qué hace cada parte del código.', rows:6, mono:false },
-      { label:'Problemas en producción y mejoras', placeholder:'¿Qué fallaría en producción? ¿Qué cambiarías?', rows:5, mono:false },
+      { label:'¿Qué hace? Explica cada paso', placeholder:'Explica con tus palabras qué hace cada bloque del código.', rows:6, mono:false },
+      { label:'¿Qué mejorarías?', placeholder:'¿Qué pasaría si el fichero no existe? ¿Y si hay valores nulos en cantidad o precio_unitario?', rows:4, mono:false },
     ]
   },
   {
-    id:'p2', level:'Mid', title:'Ingesta incremental basada en watermark',
-    prompt:'¿Qué hace esta función? ¿Qué problemas tiene para usarla en producción? Presta especial atención a la línea marcada con el comentario.',
+    id:'p2', level:'Junior', title:'Encuentra el bug',
+    prompt:'Esta función debería devolver los clientes con más de N pedidos, pero devuelve resultados incorrectos. ¿Dónde está el problema?',
     code:`import pandas as pd
-import logging
-from pathlib import Path
-from datetime import datetime
 
-logger = logging.getLogger(__name__)
+def clientes_frecuentes(df: pd.DataFrame, minimo: int) -> pd.DataFrame:
 
-def ingestar_incremental(
-    origen: str,
-    destino: str,
-    watermark_col: str = 'updated_at',
-    ultimo_proceso: datetime | None = None,
-) -> dict:
+    conteo = df.groupby('cliente_id')['pedido_id'].count()
 
-    df = pd.read_parquet(origen)
+    clientes = conteo[conteo > minimo]
 
-    if ultimo_proceso is not None:
-        df = df[df[watermark_col] > ultimo_proceso]
+    resultado = df[df['cliente_id'].isin(clientes)]
 
-    if df.empty:
-        logger.info('Sin registros nuevos desde %s', ultimo_proceso)
-        return {'registros': 0, 'status': 'skipped'}
-
-    ruta = Path(destino)
-    modo = 'a' if ruta.exists() else 'w'   # <-- ojo aquí
-
-    df.to_parquet(destino, engine='pyarrow', index=False)
-
-    nuevo_watermark = df[watermark_col].max()
-    logger.info('Procesados %d registros. Nuevo watermark: %s',
-                len(df), nuevo_watermark)
-
-    return {'registros': len(df), 'watermark': nuevo_watermark, 'status': 'ok'}`,
+    return resultado.drop_duplicates('cliente_id')[['cliente_id', 'nombre']]`,
     answers:[
-      { label:'¿Qué hace? ¿Qué patrón implementa?', placeholder:'Explica el propósito de la función y el patrón de diseño utilizado.', rows:5, mono:false },
-      { label:'Problemas identificados y mejoras', placeholder:'¿Qué problemas tiene? Especialmente, ¿qué ocurre con la línea marcada?', rows:6, mono:false },
+      { label:'¿Dónde está el bug y por qué?', placeholder:'Explica qué devuelve realmente la función y en qué caso falla.', rows:5, mono:false },
+      { label:'¿Cómo lo corregirías?', placeholder:'Escribe la corrección o explícala con palabras.', rows:4, mono:false },
     ]
   },
   {
-    id:'p3', level:'Mid', title:'Validación de calidad de datos con dataclass',
-    prompt:'¿Qué hace este módulo? ¿Es suficiente para un entorno de producción real? ¿Qué validaciones añadirías?',
-    code:`from dataclasses import dataclass, field
-import pandas as pd
-
-@dataclass
-class ResultadoValidacion:
-    valido: bool = True
-    errores: list[str] = field(default_factory=list)
-
-    def fallo(self, msg: str):
-        self.valido = False
-        self.errores.append(msg)
-
-
-def validar_pedidos(df: pd.DataFrame) -> ResultadoValidacion:
-    r = ResultadoValidacion()
-
-    # 1. Columnas obligatorias
-    requeridas = {'pedido_id', 'cliente_id', 'fecha', 'estado', 'importe'}
-    faltantes  = requeridas - set(df.columns)
-    if faltantes:
-        r.fallo(f'Columnas faltantes: {faltantes}')
-        return r
-
-    # 2. Nulos en columnas críticas
-    for col in ['pedido_id', 'cliente_id', 'fecha']:
-        n = df[col].isna().sum()
-        if n > 0:
-            r.fallo(f'{col}: {n} valores nulos')
-
-    # 3. Importes negativos
-    if (df['importe'] < 0).sum() > 0:
-        r.fallo(f"importe: {(df['importe'] < 0).sum()} valores negativos")
-
-    # 4. Estados válidos
-    estados_ok = {'pendiente', 'completado', 'cancelado', 'devuelto'}
-    invalidos  = ~df['estado'].isin(estados_ok)
-    if invalidos.any():
-        r.fallo(f"estados inválidos: {df.loc[invalidos,'estado'].unique().tolist()}")
-
-    # 5. Duplicados en PK
-    dupes = df['pedido_id'].duplicated().sum()
-    if dupes > 0:
-        r.fallo(f'pedido_id: {dupes} duplicados')
-
-    return r`,
-    answers:[
-      { label:'¿Qué hace? Describe el patrón de diseño', placeholder:'Explica la lógica y por qué se acumulan los errores en lugar de lanzar excepción al primer fallo.', rows:5, mono:false },
-      { label:'¿Es suficiente para producción? ¿Qué añadirías?', placeholder:'¿Qué validaciones faltan? ¿Cambiarías algo del diseño?', rows:6, mono:false },
-    ]
-  },
-  {
-    id:'p4', level:'Senior', title:'Procesamiento paralelo con chunks',
-    prompt:'Explica el patrón de diseño, sus ventajas y sus riesgos. ¿Qué cambiarías para un entorno de producción con ficheros de varios GB?',
+    id:'p3', level:'Mid', title:'¿Qué problema tiene este pipeline?',
+    prompt:'Este código funciona con datos de prueba pero falla en producción con ficheros grandes. ¿Por qué? ¿Cómo lo arreglarías?',
     code:`import pandas as pd
-from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Callable
-import logging
 
-logger = logging.getLogger(__name__)
+def procesar_pedidos(ruta: str) -> pd.DataFrame:
 
-def procesar_en_chunks(
-    ruta: Path,
-    transform_fn: Callable[[pd.DataFrame], pd.DataFrame],
-    chunk_size: int = 100_000,
-    max_workers: int = 4,
-) -> pd.DataFrame:
+    df = pd.read_csv(ruta)
 
-    reader     = pd.read_csv(ruta, chunksize=chunk_size)
-    resultados = []
+    resultado = pd.DataFrame()
+    for _, fila in df.iterrows():
+        enriquecida = pd.DataFrame([{
+            'pedido_id': fila['pedido_id'],
+            'cliente':   fila['cliente_id'],
+            'importe':   fila['cantidad'] * fila['precio_unitario'],
+            'iva':       fila['cantidad'] * fila['precio_unitario'] * 0.21,
+        }])
+        resultado = pd.concat([resultado, enriquecida])
 
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futuros = {
-            executor.submit(transform_fn, chunk): i
-            for i, chunk in enumerate(reader)
-        }
-        for futuro in as_completed(futuros):
-            idx = futuros[futuro]
-            try:
-                resultado = futuro.result()
-                resultados.append(resultado)
-            except Exception as e:
-                logger.error('Error en chunk %d: %s', idx, e)
-
-    if not resultados:
-        return pd.DataFrame()
-
-    return pd.concat(resultados, ignore_index=True)`,
+    return resultado.reset_index(drop=True)`,
     answers:[
-      { label:'Patrón implementado y ventajas', placeholder:'¿Qué patrón de diseño se usa? ¿Qué ventajas ofrece?', rows:5, mono:false },
-      { label:'Riesgos y mejoras para producción', placeholder:'¿Qué riesgos tiene con ficheros grandes? ¿ThreadPoolExecutor es la elección correcta aquí?', rows:7, mono:false },
+      { label:'¿Por qué falla con ficheros grandes?', placeholder:'Identifica los problemas de rendimiento. ¿Qué ocurre en memoria con cada iteración?', rows:5, mono:false },
+      { label:'¿Cómo lo reescribirías?', placeholder:'No hace falta código exacto. Explica cómo lo harías de forma eficiente.', rows:5, mono:false },
+    ]
+  },
+  {
+    id:'p4', level:'Mid', title:'Transformación con PySpark',
+    prompt:'Explica qué hace este código. ¿Hay algo que te llame la atención en términos de rendimiento?',
+    code:`from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+def ventas_por_cliente(ruta_entrada: str, ruta_salida: str) -> None:
+
+    spark = SparkSession.builder \\
+        .appName("ventas_por_cliente") \\
+        .getOrCreate()
+
+    df = spark.read.parquet(ruta_entrada)
+
+    df = df.filter(F.col('estado') != 'cancelado')
+
+    resultado = df.groupBy('cliente_id').agg(
+        F.sum(F.col('cantidad') * F.col('precio_unitario')).alias('importe_total'),
+        F.count('pedido_id').alias('num_pedidos'),
+    )
+
+    resultado \\
+        .orderBy(F.col('importe_total').desc()) \\
+        .write \\
+        .mode('overwrite') \\
+        .parquet(ruta_salida)
+
+    spark.stop()`,
+    answers:[
+      { label:'¿Qué hace? Explica cada bloque', placeholder:'Explica qué hace cada parte del código.', rows:5, mono:false },
+      { label:'¿Detectas algún problema de rendimiento?', placeholder:'¿Hay alguna operación que podría ser costosa con millones de filas?', rows:5, mono:false },
     ]
   },
 ];
-
 // ══════════════════════════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════════════════════════
@@ -1329,6 +1293,33 @@ function startTest(){
   showScreen('screen-test');
   goToSection(0);
 }
+
+// ══════════════════════════════════════════════════════════════
+// ACTUALIZAR TOTALES EN WELCOME
+// ══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  const grid = document.getElementById('info-grid-dynamic');
+  if (grid) {
+    grid.innerHTML = `
+      <div class="info-item">
+        <div class="label">Parte 1</div>
+        <div class="value">${MC_QUESTIONS.length} preguntas tipo test</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Parte 2</div>
+        <div class="value">${OPEN_QUESTIONS.length} preguntas abiertas</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Parte 3</div>
+        <div class="value">${SQL_EXERCISES.length} ejercicios SQL</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Parte 4</div>
+        <div class="value">${PYTHON_EXERCISES.length} snippets Python</div>
+      </div>
+    `;
+  }
+});
 
 // ══════════════════════════════════════════════════════════════════
 // SCREENS
@@ -1455,7 +1446,6 @@ function renderMC(container){
       <div class="mc-header">
         <span class="mc-num">${qi+1}.</span>
         <div style="flex:1">
-          <div style="margin-bottom:8px">${levelBadge(q.level)}</div>
           <div class="mc-text">${q.q}</div>
         </div>
       </div>
@@ -1503,9 +1493,6 @@ function renderOpen(container){
       <div class="open-header">
         <span class="open-num">${qi+1}.</span>
         <div class="open-content">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-            ${levelBadge(q.level)}
-          </div>
           <div class="open-title">${q.title}</div>
           <div class="open-text">${q.text}</div>
         </div>
@@ -1575,7 +1562,6 @@ lineas_pedido (linea_id INT PK, pedido_id INT FK, producto_id INT FK, cantidad I
 
     div.innerHTML = `
       <div class="exercise-header">
-        ${levelBadge(ex.level)}
         <span class="exercise-type ${typeClass}">${ex.type}</span>
         <span class="exercise-title">${ex.title}</span>
       </div>
@@ -1632,7 +1618,6 @@ function renderPython(container){
 
     div.innerHTML = `
       <div class="exercise-header">
-        ${levelBadge(ex.level)}
         <span class="exercise-type type-read">LECTURA</span>
         <span class="exercise-title">${ex.title}</span>
       </div>
@@ -1729,12 +1714,114 @@ function buildPayload(){
   };
 }
 
+function sanitizeFileName(value){
+  return String(value || 'candidato')
+    .replace(/[^\w\-]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 80) || 'candidato';
+}
+
+function addWrappedText(doc, text, margin, maxWidth, yObj, lineHeight){
+  const lines = doc.splitTextToSize(String(text || ''), maxWidth);
+  for(let i = 0; i < lines.length; i++){
+    if(yObj.value > 790){
+      doc.addPage();
+      yObj.value = 50;
+    }
+    doc.text(lines[i], margin, yObj.value);
+    yObj.value += lineHeight;
+  }
+}
+
+function downloadBackupPdf(){
+  const payload = buildPayload();
+  const jspdfNs = window.jspdf;
+
+  if(!jspdfNs || !jspdfNs.jsPDF){
+    showToast('No se pudo generar el PDF (librería no cargada).');
+    return;
+  }
+
+  const { jsPDF } = jspdfNs;
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const margin = 40;
+  const maxWidth = doc.internal.pageSize.getWidth() - margin * 2;
+  const y = { value: 50 };
+  const lineHeight = 14;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('Backup respuestas - Test Data Engineering', margin, y.value);
+  y.value += 22;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  addWrappedText(doc, 'Nombre: ' + payload.candidate.name, margin, maxWidth, y, lineHeight);
+  addWrappedText(doc, 'Email: ' + payload.candidate.email, margin, maxWidth, y, lineHeight);
+  addWrappedText(doc, 'Experiencia: ' + payload.candidate.exp, margin, maxWidth, y, lineHeight);
+  addWrappedText(doc, 'Fecha: ' + payload.submittedAt, margin, maxWidth, y, lineHeight);
+  addWrappedText(doc, 'Cambios de pestana: ' + payload.tabSwitches, margin, maxWidth, y, lineHeight);
+  y.value += 8;
+
+  doc.setFont('helvetica', 'bold');
+  addWrappedText(doc, 'TEST TIPO TEST', margin, maxWidth, y, lineHeight);
+  doc.setFont('helvetica', 'normal');
+  payload.mcResults.forEach((r, i) => {
+    addWrappedText(doc, (i + 1) + '. ' + r.question, margin, maxWidth, y, lineHeight);
+    addWrappedText(doc, 'Respuesta: ' + r.selected, margin, maxWidth, y, lineHeight);
+    y.value += 6;
+  });
+
+  doc.setFont('helvetica', 'bold');
+  addWrappedText(doc, 'PREGUNTAS ABIERTAS', margin, maxWidth, y, lineHeight);
+  doc.setFont('helvetica', 'normal');
+  payload.openResults.forEach((r, i) => {
+    addWrappedText(doc, (i + 1) + '. ' + r.title, margin, maxWidth, y, lineHeight);
+    addWrappedText(doc, r.answer || '(sin respuesta)', margin, maxWidth, y, lineHeight);
+    y.value += 6;
+  });
+
+  doc.setFont('helvetica', 'bold');
+  addWrappedText(doc, 'SQL', margin, maxWidth, y, lineHeight);
+  doc.setFont('helvetica', 'normal');
+  payload.sqlResults.forEach((r, i) => {
+    addWrappedText(doc, (i + 1) + '. ' + r.title + ' [' + r.type + ']', margin, maxWidth, y, lineHeight);
+    (r.answers || []).forEach((ans, j) => {
+      addWrappedText(doc, 'Parte ' + (j + 1) + ': ' + (ans || '(sin respuesta)'), margin, maxWidth, y, lineHeight);
+    });
+    y.value += 6;
+  });
+
+  doc.setFont('helvetica', 'bold');
+  addWrappedText(doc, 'PYTHON', margin, maxWidth, y, lineHeight);
+  doc.setFont('helvetica', 'normal');
+  payload.pyResults.forEach((r, i) => {
+    addWrappedText(doc, (i + 1) + '. ' + r.title, margin, maxWidth, y, lineHeight);
+    (r.answers || []).forEach((ans, j) => {
+      addWrappedText(doc, 'Parte ' + (j + 1) + ': ' + (ans || '(sin respuesta)'), margin, maxWidth, y, lineHeight);
+    });
+    y.value += 6;
+  });
+
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const fileName = 'backup_test_' + sanitizeFileName(payload.candidate.name) + '_' + stamp + '.pdf';
+  doc.save(fileName);
+  showToast('PDF descargado correctamente');
+}
+
 async function submitTest(){
+
   const btn = document.getElementById('btn-submit');
   btn.disabled = true;
   btn.textContent = 'Enviando...';
 
   const payload = buildPayload();
+  // Descargar PDF automáticamente antes de enviar
+  try {
+    downloadBackupPdf();
+  } catch (e) {
+    console.warn('No se pudo generar PDF antes del envío', e);
+  }
 
   // ── FORMSPREE ENDPOINT ─────────────────────────────────────────
   // Replace with your Formspree form ID: https://formspree.io/
