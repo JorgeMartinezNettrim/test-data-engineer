@@ -940,7 +940,19 @@ const MC_QUESTIONS = [
   { id:'a5', block:'A', level:'Senior', q:'¿Cuál es la estrategia más eficiente para calcular totales acumulados (running totals) sobre millones de filas en un warehouse columnar?', opts:['Subconsulta correlacionada con SUM sobre todas las filas anteriores','Función de ventana: SUM() OVER (ORDER BY fecha ROWS UNBOUNDED PRECEDING)','Cursor iterando fila a fila','Tabla temporal con los totales + JOIN'], correct:1 },
   { id:'a6', block:'A', level:'Senior', q:"En un data warehouse de gran volumen, ¿qué es la 'partition pruning' y cuándo ocurre?", opts:['Eliminar columnas redundantes de la tabla de hechos','El motor salta particiones que no pueden contener datos relevantes para el filtro aplicado','Comprimir las particiones más antiguas automáticamente','Dividir una partición grande en varias más pequeñas'], correct:1 },
   // BLOQUE B — Arquitecturas
-  { id:'b1', block:'B', level:'Junior', q:'¿Qué diferencia un Data Lake de un Data Warehouse?', opts:['El Data Lake solo almacena datos relacionales; el DWH acepta cualquier formato','El Data Lake almacena datos en formato raw sin estructura fija; el DWH almacena datos estructurados y modelados','El Data Warehouse es más barato de mantener','No hay diferencia relevante, son sinónimos modernos'], correct:1 },
+  { 
+  id: 'b1', 
+  block: 'B', 
+  level: 'Junior', 
+  q: '¿Cuál es la principal evolución que introduce el modelo Data Lakehouse frente a la arquitectura tradicional de Data Lake y Data Warehouse?', 
+  opts: [
+    'Elimina la necesidad de usar SQL, obligando a procesar todos los datos mediante archivos de texto plano.', 
+    'Implementa una capa de metadatos y transacciones (como Delta Lake o Iceberg) sobre un Data Lake, permitiendo ACID, gobernanza y rendimiento de Warehouse sobre datos económicos en la nube.', 
+    'Es una base de datos puramente relacional que prohíbe el almacenamiento de datos no estructurados como imágenes o JSON.', 
+    'Funciona exclusivamente en servidores on-premise para garantizar la seguridad física de los datos estructurados.'
+  ], 
+  correct: 1 
+},
   { id:'b2', block:'B', level:'Junior', q:'En una arquitectura medallion (Bronze/Silver/Gold), ¿qué contiene la capa Bronze?', opts:['Datos agregados listos para consumo de negocio','Datos limpios y normalizados','Datos raw tal como llegan de la fuente, sin transformar','Modelos de Machine Learning entrenados'], correct:2 },
   { id:'b3', block:'B', level:'Mid', q:'¿Cuál es la principal ventaja del patrón Lambda Architecture frente a procesar todo en batch?', opts:['Elimina completamente el procesamiento batch','Combina batch (alta precisión, alta latencia) con streaming (baja latencia, aproximados) para respuestas en tiempo real','Es más sencillo de implementar que un pipeline batch puro','Solo funciona con datos estructurados'], correct:1 },
   { id:'b4', block:'B', level:'Mid', q:"¿Qué es un 'data lakehouse' y qué problema resuelve frente al data lake tradicional?", opts:['Un data lake con más capacidad de almacenamiento','Un DWH migrado a cloud sin cambios','Arquitectura que añade ACID, schema enforcement y rendimiento analítico sobre el storage del data lake','Un sistema que reemplaza el data lake por un warehouse columnar'], correct:2 },
@@ -958,13 +970,37 @@ const MC_QUESTIONS = [
   { id:'d2', block:'D', level:'Junior', q:"¿Qué significa que un servicio cloud sea 'serverless' en data engineering?", opts:['No tiene servidor físico; los datos se almacenan en la nube de otro proveedor','No requiere aprovisionar ni gestionar infraestructura; el proveedor escala automáticamente y se factura por uso real','Es gratuito para cargas pequeñas','Solo funciona sin conexión a internet'], correct:1 },
   { id:'d3', block:'D', level:'Mid', q:'En AWS, ¿cuál es la diferencia entre S3 Standard, S3 Intelligent-Tiering y S3 Glacier?', opts:['Solo difieren en el límite de tamaño de objeto','Standard: acceso frecuente; Intelligent-Tiering: mueve objetos según patrón de acceso; Glacier: archivado, latencia alta, coste muy bajo','Intelligent-Tiering y Glacier son sinónimos','Standard es la única opción con 11 nueves de durabilidad'], correct:1 },
   { id:'d4', block:'D', level:'Mid', q:"¿Qué es el 'egress cost' en cloud y por qué es relevante en arquitecturas multi-cloud?", opts:['El coste de ingestar datos desde fuentes externas','El coste de transferir datos fuera de la región o proveedor; puede ser significativo al mover grandes volúmenes entre clouds o hacia on-premise','El coste de almacenamiento de datos temporales','No existe en proveedores enterprise con contrato'], correct:1 },
-  { id:'d5', block:'D', level:'Senior', q:'En Kubernetes (EKS/AKS/GKE), ¿cuál es la ventaja de Karpenter frente al Cluster Autoscaler clásico?', opts:['Karpenter solo funciona en AWS','Karpenter provisiona nodos con los tipos de instancia óptimos para cada pod sin depender de node groups predefinidos, siendo más rápido y flexible','Cluster Autoscaler es más rápido porque usa node groups preconfigurados','No hay diferencia funcional'], correct:1 },
+  { 
+  id: 'd5', 
+  block: 'D', 
+  level: 'Senior', 
+  q: 'En entornos de computación distribuida (como Apache Spark), ¿cuál es la estrategia más eficiente para mitigar el impacto del "Data Skew" (sesgo de datos) durante una operación de JOIN de gran volumen?', 
+  opts: [
+    'Incrementar linealmente el número de ejecutores en el clúster hasta que el nodo rezagado tenga suficiente memoria RAM para procesar su partición.', 
+    'Implementar técnicas de "Salting", añadiendo una clave aleatoria a los datos sesgados para redistribuirlos uniformemente entre múltiples particiones y evitar nodos cuello de botella.', 
+    'Deshabilitar el "Adaptive Query Execution" (AQE) para forzar al planificador a utilizar un tamaño de partición estático e idéntico para todas las tareas.', 
+    'Convertir la operación de JOIN en un "Broadcast Hash JOIN" sin importar el tamaño de la tabla más grande para evitar la fase de Shuffle.'
+  ], 
+  correct: 1 
+},
   // BLOQUE E — Calidad
   { id:'e1', block:'E', level:'Junior', q:'¿Cuál de estas métricas NO es una dimensión estándar de calidad de datos?', opts:['Completitud (no hay valores nulos inesperados)','Unicidad (no hay duplicados)','Velocidad de ingesta (tiempo de carga)','Consistencia (valores coherentes entre sistemas)'], correct:2 },
   { id:'e2', block:'E', level:'Junior', q:'¿Qué es el linaje de datos (data lineage)?', opts:['Un log de todos los usuarios que han accedido a un dataset','El registro del origen de los datos y todas las transformaciones que han sufrido desde la fuente hasta el destino final','Un índice para acelerar consultas sobre tablas grandes','La política de retención de datos de una organización'], correct:1 },
   { id:'e3', block:'E', level:'Mid', q:'¿Qué diferencia un catálogo de datos de un diccionario de datos?', opts:['Son exactamente lo mismo con distinto nombre','El diccionario define el significado técnico de campos; el catálogo añade descubrimiento, linaje, métricas de calidad, clasificación y colaboración','El catálogo solo cubre datos estructurados','El diccionario es una funcionalidad dentro del catálogo'], correct:1 },
   
-  { id:'e5', block:'E', level:'Senior', q:'¿Cuál es el principal riesgo de implementar RLS solo en la capa de reporting (Power BI, Tableau) en lugar de en la capa de datos?', opts:['El RLS en reporting es más difícil de configurar','Si los usuarios acceden por otras vías (APIs, SQL directo, exports), el RLS de reporting no aplica y los datos quedan desprotegidos','El RLS en reporting tiene peor rendimiento','No hay riesgo diferencial; son equivalentes en seguridad'], correct:1 },
+  { 
+  id: 'e5', 
+  block: 'E', 
+  level: 'Senior', 
+  q: 'En una arquitectura Lakehouse con almacenamiento desacoplado del cómputo, ¿cuál es el principal riesgo de implementar Row-Level Security (RLS) únicamente mediante vistas en el motor de servicio (Compute Layer)?', 
+  opts: [
+    'Invalida automáticamente la caché de consultas de todas las herramientas de BI conectadas.', 
+    'Los usuarios con acceso directo de lectura al almacenamiento subyacente (Storage Layer / Data Lake) pueden saltarse las restricciones de seguridad y leer los archivos Parquet/Delta directamente.', 
+    'Fuerza al motor de almacenamiento a duplicar físicamente los archivos de datos para cada rol configurado.', 
+    'Incrementa exponencialmente el tiempo de compilación de los trabajos de streaming que escriben en el Lakehouse.'
+  ], 
+  correct: 1 
+},
   // BLOQUE F — Fabric
   { id:'f1', block:'F', level:'Junior', q:'¿Cuál es el formato de almacenamiento nativo de las tablas en un Microsoft Fabric Lakehouse?', opts:['CSV comprimido con GZIP','Apache Parquet sin gestión transaccional','Delta Lake (Delta Parquet con transaction log)','ORC (Optimized Row Columnar)'], correct:2 },
   { id:'f2', block:'F', level:'Junior', q:"¿Qué es un 'Shortcut' en Microsoft Fabric OneLake?", opts:['Un acceso directo a una dashboard de Power BI','Una referencia a datos en storage externo (S3, ADLS, GCS) que permite leerlos desde Fabric sin moverlos físicamente','Un alias para renombrar tablas dentro del Lakehouse','Un tipo de pipeline optimizado para cargas incrementales'], correct:1 },
@@ -972,7 +1008,19 @@ const MC_QUESTIONS = [
   { id:'f4', block:'F', level:'Mid', q:"¿Qué modo de conectividad usa Power BI en 'Direct Lake' y cuál es su principal limitación?", opts:['Lee Delta Files en OneLake sin importarlos; la limitación es el tope de filas por tabla según el SKU de capacidad, con fallback a DirectQuery','Importa datos al modelo cada hora; la limitación es la latencia','Usa DirectQuery sobre el SQL Endpoint; la limitación es el rendimiento en modelos complejos','Direct Lake no tiene limitaciones; es superior a Import Mode en todos los escenarios'], correct:0 },
   { id:'f5', block:'F', level:'Senior', q:'En Microsoft Fabric, ¿cómo se gestiona el aislamiento entre entornos (Dev/Test/Prod)?', opts:['Fabric no soporta múltiples entornos','Mediante Deployment Pipelines (Dev→Test→Prod) con integración Git y workspaces separados por entorno','Solo se puede usar un workspace por tenant de Microsoft 365','El aislamiento se gestiona exclusivamente mediante ramas de Git sin herramienta nativa'], correct:1 },
   { id:'f6', block:'F', level:'Senior', q:"¿Qué implica el 'capacity throttling' en Microsoft Fabric?", opts:['El workspace se pausa automáticamente después de 8 horas','Cuando los workloads consumen más CUs de los asignados, Fabric limita o encola la ejecución; se mitiga separando cargas pesadas en horarios distintos y optimizando jobs','Solo ocurre con capacidades F2 y F4','El throttling elimina datos procesados a medias'], correct:1 },
-  { id:'f7', block:'F', level:'Senior', q:'¿Cuál es la diferencia entre OneLake Data Access Roles y Workspace Roles en Fabric?', opts:['Son el mismo mecanismo con distinto nombre','Workspace Roles controlan acceso a artefactos del workspace; OneLake Data Access Roles permiten control granular a nivel de carpeta o tabla dentro del lakehouse','OneLake Data Access Roles solo aplican a shortcuts externos','Workspace Roles son más granulares'], correct:1 },
+  { 
+  id: 'f7', 
+  block: 'F', 
+  level: 'Senior', 
+  q: '¿Cuál es el principal beneficio de aplicar V-Order a las tablas Delta dentro de un Lakehouse?', 
+  opts: [
+    'Cifra los datos en reposo automáticamente utilizando claves gestionadas por el cliente (CMK).', 
+    'Aplica una ordenación y optimización interna al formato Parquet que acelera drásticamente los tiempos de lectura para los motores de consulta SQL y Spark.', 
+    'Permite realizar operaciones de Time Travel (viaje en el tiempo) de forma nativa sin necesidad de mantener un registro de transacciones.', 
+    'Convierte automáticamente los archivos de tipo fila (Row-oriented) en archivos columnares (Columnar) en tiempo real durante la ingesta de streaming.'
+  ], 
+  correct: 1 
+},
 ];
 
 const OPEN_QUESTIONS = [
