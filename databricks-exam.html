@@ -912,6 +912,10 @@ textarea, input[type="text"], input[type="email"] {
       Tus respuestas han sido registradas correctamente.<br>
       El equipo se pondrá en contacto contigo en los próximos días.
     </p>
+    <div style="margin-top:20px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-outline" onclick="returnToSubmitScreen()">← Volver al resumen</button>
+      <button class="btn btn-outline" onclick="downloadBackupPdf()">Descargar PDF</button>
+    </div>
   </div>
 </div>
 
@@ -1658,6 +1662,18 @@ function showSubmit(){
   document.getElementById('stat-time').textContent  = `${em}:${es}`;
 
   showScreen('screen-submit');
+}
+
+function returnToSubmitScreen(){
+  document.getElementById('topbar').style.display = 'flex';
+  document.getElementById('progress-bar').style.display = 'block';
+  showSubmit();
+
+  const btn = document.getElementById('btn-submit');
+  if(btn){
+    btn.disabled = true;
+    btn.textContent = 'Enviado ✓';
+  }
 }
 
 function buildPayload(){
