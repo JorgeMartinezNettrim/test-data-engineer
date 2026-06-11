@@ -807,7 +807,7 @@ textarea, input[type="text"], input[type="email"] {
       <img src="https://www.nettrim.es/wp-content/uploads/2022/06/nettrim-technology-blanco.png" alt="Nettrim logo">
     </div>
     <div class="welcome-logo">Data Engineering · Technical Assessment</div>
-    <p class="welcome-subtitle">Databricks · SQL · PySpark</p>
+    <p class="welcome-subtitle">SQL · Python · Arquitecturas</p>
 
     <div class="welcome-card">
       <h3>Estructura de la prueba</h3>
@@ -959,21 +959,21 @@ const MC_QUESTIONS = [
   { id:'b5', block:'B', level:'Senior', q:"En streaming, ¿cuál es la diferencia entre 'event time' y 'processing time'?", opts:['Son sinónimos; solo el nombre cambia según el framework','Event time es cuándo ocurrió el evento en la fuente; processing time es cuándo llega al sistema. Importa por los eventos desordenados y late data','Event time solo aplica a datos IoT','Processing time siempre es mayor que event time'], correct:1 },
   { id:'b6', block:'B', level:'Senior', q:'¿Qué garantías de consistencia ofrece Delta Lake frente a Parquet puro?', opts:['Delta ofrece mayor compresión','Delta añade ACID, time travel, schema enforcement y DML (UPDATE/DELETE/MERGE)','Parquet tiene soporte transaccional nativo; Delta solo añade índices','Delta Lake solo funciona con Spark'], correct:1 },
   // BLOQUE C — Orquestación
-  { id:'c1', block:'C', level:'Junior', q:'En Databricks Workflows, ¿qué representa un Job con varias tareas encadenadas?', opts:['Un notebook aislado sin dependencias','Un flujo orquestado de tareas con dependencias, reintentos y planificación','Un clúster persistente obligatorio para toda la organización','Un repositorio Git interno para versionado de datos'], correct:1 },
-  { id:'c2', block:'C', level:'Junior', q:'En un pipeline Delta en Databricks, ¿qué práctica ayuda más a mantener idempotencia en cargas incrementales?', opts:['Reescribir toda la tabla destino en cada ejecución','Usar MERGE con claves de negocio/evento y reglas deterministas de upsert','Desactivar checkpoints para evitar estado previo','Usar append sin deduplicación porque Delta ya evita duplicados'], correct:1 },
-  { id:'c3', block:'C', level:'Mid', q:'En Databricks, ¿qué ventaja aporta usar un Job Cluster frente a un All-Purpose Cluster para cargas batch programadas?', opts:['El Job Cluster arranca para la ejecución y se termina al finalizar, optimizando coste y aislamiento','El All-Purpose Cluster siempre es más barato porque reutiliza caché','No hay diferencias operativas entre ambos tipos','El Job Cluster no permite ejecutar notebooks, solo JARs'], correct:0 },  
-  { id:'c5', block:'C', level:'Senior', q:'En Databricks, ¿cuál es la principal ventaja operativa de Delta Live Tables (DLT) frente a jobs de notebooks ad-hoc?', opts:['DLT reemplaza totalmente Spark SQL y solo permite Python','DLT aporta declaratividad, expectativas de calidad, gestión de dependencias y recuperación simplificada de pipelines','DLT obliga a usar clusters all-purpose','DLT solo sirve para batch y no para streaming'], correct:1 },
-  { id:'c6', block:'C', level:'Senior', q:'En Databricks Workflows, ¿qué problema resuelve un backfill de particiones/fechas?', opts:['Incrementar la memoria del driver para cargas futuras','Reprocesar periodos históricos no ejecutados o con datos corregidos sin alterar toda la historia','Eliminar la necesidad de checkpoints en streaming','Evitar por completo el uso de tablas Delta'], correct:1 },
+  { id:'c1', block:'C', level:'Junior', q:'¿Qué es un DAG en el contexto de Apache Airflow?', opts:['Una base de datos optimizada para grafos','Un Directed Acyclic Graph: define tareas de un workflow y sus dependencias sin ciclos','Un contenedor Docker para ejecutar pipelines','Un formato YAML para configurar pipelines'], correct:1 },
+  { id:'c2', block:'C', level:'Junior', q:'¿Cuál describe mejor el concepto de idempotencia en un pipeline de datos?', opts:['El pipeline se ejecuta automáticamente si falla','Ejecutar el pipeline múltiples veces con el mismo input produce siempre el mismo resultado sin efectos secundarios','El pipeline procesa datos en orden estrictamente cronológico','El pipeline puede ejecutarse en paralelo sin coordinación'], correct:1 },
+  { id:'c3', block:'C', level:'Mid', q:"¿Cuál es la diferencia entre un trigger de tipo 'schedule' y uno de tipo 'sensor' en Airflow?", opts:["El schedule ejecuta en base a tiempo; el sensor espera a que una condición externa se cumpla (ej: que exista un fichero)",'El sensor es más rápido que el schedule','Son sinónimos en Airflow moderno','El sensor solo funciona con bases de datos; el schedule con ficheros'], correct:0 },  
+  { id:'c5', block:'C', level:'Senior', q:'¿Cuál es la afirmación correcta sobre ELT frente a ETL en cloud data platforms?', opts:['ELT es siempre más rápido independientemente del volumen','ETL transforma antes de cargar; ELT carga en crudo y transforma dentro del warehouse aprovechando su cómputo','ELT elimina la necesidad de orquestación','ETL es la única opción válida para streaming'], correct:1 },
+  { id:'c6', block:'C', level:'Senior', q:"¿Qué problema resuelve el concepto de 'backfill' en Airflow?", opts:['Llenar el storage cuando está casi lleno','Ejecutar runs de DAG para intervalos de tiempo pasados que no se procesaron en su momento','Revertir cambios en la base de datos de metadatos','Precalentar la caché de resultados'], correct:1 },
   // BLOQUE D — Cloud
-  { id:'d1', block:'D', level:'Junior', q:'En un Lakehouse de Databricks, ¿cuál es la base de almacenamiento recomendada para tablas Delta a gran escala?', opts:['Almacenamiento de objetos cloud (S3, ADLS o GCS)','Disco local del driver para minimizar latencia','Base de datos relacional OLTP gestionada','Almacenamiento en memoria distribuida permanente'], correct:0 },
-  { id:'d2', block:'D', level:'Junior', q:'En Databricks Serverless SQL, ¿qué implica el modo serverless para el equipo de datos?', opts:['Que deben administrar manualmente nodos y autoscaling','Que Databricks gestiona el cómputo y escalado, pagando por consumo y reduciendo operación de infraestructura','Que solo se pueden lanzar consultas desde notebooks','Que no se puede aplicar control de acceso por catálogo/esquema'], correct:1 },
-  { id:'d3', block:'D', level:'Mid', q:'En Databricks SQL Warehouse, ¿cuál es una práctica recomendada para equilibrar rendimiento y coste?', opts:['Mantener siempre un warehouse 2X-Large encendido para evitar latencia','Configurar auto-stop y elegir tamaño según concurrencia/carga esperada','Desactivar el cacheado para evitar resultados inconsistentes','Ejecutar todas las consultas analíticas en clústeres all-purpose'], correct:1 },
-  { id:'d4', block:'D', level:'Mid', q:'En Databricks con Unity Catalog, ¿qué aporta una External Location gobernada frente a rutas cloud ad-hoc?', opts:['Reduce tamaño de ficheros Parquet automáticamente','Centraliza permisos y credenciales de acceso a storage con gobierno unificado y auditoría','Obliga a copiar todos los datos a DBFS','Elimina la necesidad de metastore y catálogos'], correct:1 },
+  { id:'d1', block:'D', level:'Junior', q:'¿Qué tipo de almacenamiento cloud es más adecuado para un data lake con petabytes de datos históricos raramente consultados?', opts:['Almacenamiento de objetos (S3, ADLS, GCS) con política de ciclo de vida a tier frío','Base de datos relacional gestionada (RDS, Cloud SQL)','Disco SSD adjunto a instancias de cómputo','Almacenamiento en memoria (ElastiCache, Redis)'], correct:0 },
+  { id:'d2', block:'D', level:'Junior', q:"¿Qué significa que un servicio cloud sea 'serverless' en data engineering?", opts:['No tiene servidor físico; los datos se almacenan en la nube de otro proveedor','No requiere aprovisionar ni gestionar infraestructura; el proveedor escala automáticamente y se factura por uso real','Es gratuito para cargas pequeñas','Solo funciona sin conexión a internet'], correct:1 },
+  { id:'d3', block:'D', level:'Mid', q:'En AWS, ¿cuál es la diferencia entre S3 Standard, S3 Intelligent-Tiering y S3 Glacier?', opts:['Solo difieren en el límite de tamaño de objeto','Standard: acceso frecuente; Intelligent-Tiering: mueve objetos según patrón de acceso; Glacier: archivado, latencia alta, coste muy bajo','Intelligent-Tiering y Glacier son sinónimos','Standard es la única opción con 11 nueves de durabilidad'], correct:1 },
+  { id:'d4', block:'D', level:'Mid', q:"¿Qué es el 'egress cost' en cloud y por qué es relevante en arquitecturas multi-cloud?", opts:['El coste de ingestar datos desde fuentes externas','El coste de transferir datos fuera de la región o proveedor; puede ser significativo al mover grandes volúmenes entre clouds o hacia on-premise','El coste de almacenamiento de datos temporales','No existe en proveedores enterprise con contrato'], correct:1 },
   { 
   id: 'd5', 
   block: 'D', 
   level: 'Senior', 
-  q: 'En Databricks con Apache Spark, ¿cuál es la estrategia más eficiente para mitigar el impacto del "Data Skew" durante un JOIN de gran volumen?', 
+  q: 'En entornos de computación distribuida (como Apache Spark), ¿cuál es la estrategia más eficiente para mitigar el impacto del "Data Skew" (sesgo de datos) durante una operación de JOIN de gran volumen?', 
   opts: [
     'Incrementar linealmente el número de ejecutores en el clúster hasta que el nodo rezagado tenga suficiente memoria RAM para procesar su partición.', 
     'Implementar técnicas de "Salting", añadiendo una clave aleatoria a los datos sesgados para redistribuirlos uniformemente entre múltiples particiones y evitar nodos cuello de botella.', 
@@ -987,20 +987,20 @@ const MC_QUESTIONS = [
   { id:'e2', block:'E', level:'Junior', q:'¿Qué es el linaje de datos (data lineage)?', opts:['Un log de todos los usuarios que han accedido a un dataset','El registro del origen de los datos y todas las transformaciones que han sufrido desde la fuente hasta el destino final','Un índice para acelerar consultas sobre tablas grandes','La política de retención de datos de una organización'], correct:1 },
   { id:'e3', block:'E', level:'Mid', q:'¿Qué diferencia un catálogo de datos de un diccionario de datos?', opts:['Son exactamente lo mismo con distinto nombre','El diccionario define el significado técnico de campos; el catálogo añade descubrimiento, linaje, métricas de calidad, clasificación y colaboración','El catálogo solo cubre datos estructurados','El diccionario es una funcionalidad dentro del catálogo'], correct:1 },
   
-  // BLOQUE F — Databricks avanzado
-  { id:'f1', block:'F', level:'Junior', q:'¿Qué ventaja clave ofrece Unity Catalog en Databricks frente a gestionar permisos solo a nivel de tabla suelta?', opts:['Solo mejora el rendimiento de consultas SQL','Gobierno centralizado de datos/AI con permisos jerárquicos, linaje y auditoría entre workspaces','Sustituye automáticamente a Git para versionado','Elimina la necesidad de catálogos y esquemas'], correct:1 },
-  { id:'f2', block:'F', level:'Junior', q:'En Delta Lake, ¿qué funcionalidad permite consultar versiones anteriores de una tabla para auditoría o recuperación lógica?', opts:['Z-ORDER','OPTIMIZE','Time Travel','VACUUM'], correct:2 },
-  { id:'f3', block:'F', level:'Mid', q:'¿Cuándo tiene más sentido aplicar OPTIMIZE con ZORDER en una tabla Delta?', opts:['Cuando la tabla es pequena y se consulta completa sin filtros','Cuando hay muchas consultas selectivas por columnas concretas y se quiere mejorar data skipping','Solo en tablas temporales de staging','Siempre despues de cada INSERT individual'], correct:1 },
-  { id:'f4', block:'F', level:'Mid', q:'En Structured Streaming sobre Delta, ¿para qué sirve el checkpoint location?', opts:['Guardar logs de depuración del notebook','Persistir estado/offsets para tolerancia a fallos y reanudación consistente','Acelerar automáticamente joins con broadcast','Evitar que se creen ficheros pequenos en destino'], correct:1 },
-  { id:'f5', block:'F', level:'Senior', q:'¿Qué patrón es más robusto en Databricks para implementar CDC desde una capa Bronze hacia Silver?', opts:['Sobrescribir Silver completa cada 5 minutos','Aplicar MERGE INTO sobre claves de negocio con lógica de upsert/delete y control de watermark/version','Usar solo append y resolver duplicados en Gold','Eliminar registros antiguos con VACUUM en cada micro-batch'], correct:1 },  
+  // BLOQUE F — Fabric
+  { id:'f1', block:'F', level:'Junior', q:'¿Cuál es el formato de almacenamiento nativo de las tablas en un Microsoft Fabric Lakehouse?', opts:['CSV comprimido con GZIP','Apache Parquet sin gestión transaccional','Delta Lake (Delta Parquet con transaction log)','ORC (Optimized Row Columnar)'], correct:2 },
+  { id:'f2', block:'F', level:'Junior', q:"¿Qué es un 'Shortcut' en Microsoft Fabric OneLake?", opts:['Un acceso directo a una dashboard de Power BI','Una referencia a datos en storage externo (S3, ADLS, GCS) que permite leerlos desde Fabric sin moverlos físicamente','Un alias para renombrar tablas dentro del Lakehouse','Un tipo de pipeline optimizado para cargas incrementales'], correct:1 },
+  { id:'f3', block:'F', level:'Mid', q:'¿Cuándo es preferible usar Fabric Warehouse frente a Fabric Lakehouse?', opts:['Cuando se necesita procesar datos con PySpark o Python','Cuando el equipo usa SQL puro, necesita DML transaccional (UPDATE/DELETE), o tiene un modelo dimensional clásico tipo Kimball','Cuando los datos son semiestructurados (JSON, XML)','Cuando el volumen supera 1 TB'], correct:1 },
+  { id:'f4', block:'F', level:'Mid', q:"¿Qué modo de conectividad usa Power BI en 'Direct Lake' y cuál es su principal limitación?", opts:['Lee Delta Files en OneLake sin importarlos; la limitación es el tope de filas por tabla según el SKU de capacidad, con fallback a DirectQuery','Importa datos al modelo cada hora; la limitación es la latencia','Usa DirectQuery sobre el SQL Endpoint; la limitación es el rendimiento en modelos complejos','Direct Lake no tiene limitaciones; es superior a Import Mode en todos los escenarios'], correct:0 },
+  { id:'f5', block:'F', level:'Senior', q:'En Microsoft Fabric, ¿cómo se gestiona el aislamiento entre entornos (Dev/Test/Prod)?', opts:['Fabric no soporta múltiples entornos','Mediante Deployment Pipelines (Dev→Test→Prod) con integración Git y workspaces separados por entorno','Solo se puede usar un workspace por tenant de Microsoft 365','El aislamiento se gestiona exclusivamente mediante ramas de Git sin herramienta nativa'], correct:1 },  
   
 ];
 
 const OPEN_QUESTIONS = [
-  { id:'o1', level:'Junior', title:'Optimización de consulta en Databricks SQL', text:'Tienes una tabla Delta de ventas con 50 millones de filas y una consulta en Databricks SQL que tarda 2 minutos. Describe paso a paso cómo diagnosticarías y optimizarías su rendimiento.' },  
-  { id:'o2', level:'Mid', title:'Gestión de incidencias en Databricks Workflows', text:'Un Workflow crítico falla en producción y deja de actualizar tablas Gold. ¿Cómo abordarías la investigación y resolución? Explica qué revisarías (runs, logs, cluster events, data quality, lineage) y cómo comunicarías la situación.' },  
-  { id:'o3', level:'Mid', title:'Gobierno y seguridad con Unity Catalog', text:'Explica cómo diseñarías permisos y organización de catálogos/esquemas/tablas en Unity Catalog para separar dominios y entornos (Dev/Test/Prod) sin bloquear la productividad del equipo.' },
-  { id:'o4', level:'Mid', title:'Pipeline incremental con Auto Loader + Delta', text:'Diseña un pipeline incremental en Databricks desde ficheros en cloud storage hacia Bronze y Silver. ¿Qué estrategias usarías para checkpoints, evolución de esquema, deduplicación e idempotencia?' },  
+  { id:'o1', level:'Junior', title:'Optimización de una consulta SQL lenta', text:'Tienes una tabla de ventas con 50 millones de filas y una consulta SQL que tarda 2 minutos. Describe paso a paso cómo abordarías la optimización.' },  
+  { id:'o2', level:'Mid', title:'Gestión de incidencias en proyectos de datos', text:'Imagina que un pipeline crítico de datos falla en producción y deja de cargar información para los dashboards de negocio. ¿Cómo abordarías la investigación y resolución del problema? Explica los pasos que seguirías y cómo comunicarías la situación a los equipos afectados.' },  
+  { id:'o3', level:'Mid', title:'dbt y el patrón ELT moderno', text:'¿Qué es dbt (data build tool) y en qué se diferencia de un pipeline de transformación tradicional con Spark o SQL scripts?' },
+  { id:'o4', level:'Mid', title:'Pipeline de ingesta incremental', text:'Diseña un pipeline de ingesta incremental desde una base de datos transaccional (PostgreSQL) a un Data Lake. ¿Qué estrategias usarías? ' },  
 ];
 
 const SQL_EXERCISES = [
@@ -1106,94 +1106,108 @@ WHERE p.estado != 'cancelado';`,
 ];
 
 const PYTHON_EXERCISES = [
-    {
-    id:'p1', level:'Junior', title:'Notebook PySpark en Databricks: lectura y agregación',
-    prompt:'Lee el siguiente código de Databricks y explica qué hace paso a paso. Indica una mejora práctica de producción.',
-    code:`from pyspark.sql import functions as F
+  {
+    id:'p1', level:'Junior', title:'¿Qué hace esta función?',
+    prompt:'Lee el siguiente código y explica qué hace paso a paso. ¿Hay algo que mejorarías?',
+    code:`import pandas as pd
 
-  def resumen_ventas(spark, ruta_entrada: str):
-    df = spark.read.format('delta').load(ruta_entrada)
+def resumen_ventas(ruta: str) -> pd.DataFrame:
+    df = pd.read_csv(ruta)
 
-    df = df.withColumn('importe', F.col('cantidad') * F.col('precio_unitario'))
-    df = df.filter(F.col('importe') > 0)
+    df['importe'] = df['cantidad'] * df['precio_unitario']
 
-    resultado = (
-      df.groupBy('categoria')
-        .agg(
-          F.sum('importe').alias('total_ventas'),
-          F.countDistinct('pedido_id').alias('num_pedidos')
-        )
-        .withColumn('ticket_medio', F.col('total_ventas') / F.col('num_pedidos'))
-        .orderBy(F.col('total_ventas').desc())
+    df = df[df['importe'] > 0]
+
+    resultado = df.groupby('categoria').agg(
+        total_ventas = ('importe', 'sum'),
+        num_pedidos  = ('pedido_id', 'count'),
+    ).reset_index()
+
+    resultado['ticket_medio'] = (
+        resultado['total_ventas'] / resultado['num_pedidos']
     )
 
-    return resultado`,
+    return resultado.sort_values('total_ventas', ascending=False)`,
     answers:[
-      { label:'¿Qué hace? Explica cada paso', placeholder:'Explica cada transformación y agregación del DataFrame en PySpark.', rows:6, mono:false },
-      { label:'¿Qué mejorarías en Databricks?', placeholder:'Por ejemplo: control de esquema, calidad, particionado o validaciones antes de escribir.', rows:4, mono:false },
+      { label:'¿Qué hace? Explica cada paso', placeholder:'Explica con tus palabras qué hace cada bloque del código.', rows:6, mono:false },
+      { label:'¿Qué mejorarías?', placeholder:'¿Qué pasaría si el fichero no existe? ¿Y si hay valores nulos en cantidad o precio_unitario?', rows:4, mono:false },
     ]
   },
   {
-    id:'p2', level:'Junior', title:'Encuentra el bug en un job de Databricks',
-    prompt:'Este código debería filtrar clientes con más de N pedidos, pero devuelve resultados erróneos en Spark. ¿Dónde está el problema?',
-    code:`from pyspark.sql import functions as F
+    id:'p2', level:'Junior', title:'Encuentra el bug',
+    prompt:'Esta función debería devolver los clientes con más de N pedidos, pero devuelve resultados incorrectos. ¿Dónde está el problema?',
+    code:`import pandas as pd
 
-def clientes_frecuentes(df, minimo: int):
-    conteo = df.groupBy('cliente_id').agg(F.count('pedido_id').alias('num_pedidos'))
+def clientes_frecuentes(df: pd.DataFrame, minimo: int) -> pd.DataFrame:
 
-    clientes = conteo.filter(F.col('num_pedidos') > minimo)
+    conteo = df.groupby('cliente_id')['pedido_id'].count()
 
-    # bug: se hace join por pedido_id en lugar de cliente_id
-    resultado = df.join(clientes, on='pedido_id', how='inner')
+    clientes = conteo[conteo > minimo]
 
-    return resultado.select('cliente_id', 'nombre').dropDuplicates()`,
+    resultado = df[df['cliente_id'].isin(clientes)]
+
+    return resultado.drop_duplicates('cliente_id')[['cliente_id', 'nombre']]`,
     answers:[
-      { label:'¿Dónde está el bug y por qué?', placeholder:'Explica por qué el join actual rompe la lógica y qué impacto tendría en producción.', rows:5, mono:false },
-      { label:'¿Cómo lo corregirías?', placeholder:'Escribe la corrección en PySpark o descríbela con precisión.', rows:4, mono:false },
-    ]
-  },
-    {
-    id:'p3', level:'Mid', title:'Ingesta incremental con Auto Loader',
-    prompt:'Este pipeline de Databricks funciona al principio pero da problemas al reiniciar el job. ¿Por qué? ¿Cómo lo arreglarías?',
-    code:`from pyspark.sql import functions as F
-
-  def ingesta_incremental(ruta_origen: str, tabla_destino: str):
-    df = (
-      spark.readStream
-         .format('cloudFiles')
-         .option('cloudFiles.format', 'json')
-         .load(ruta_origen)
-    )
-
-    (df.withColumn('ingestion_ts', F.current_timestamp())
-       .writeStream
-       .format('delta')
-       .outputMode('append')
-       # bug: falta checkpointLocation
-       .toTable(tabla_destino))`,
-    answers:[
-      { label:'¿Qué riesgo operativo tiene?', placeholder:'Explica qué pasa con la recuperación/duplicados si se reinicia sin checkpoint.', rows:5, mono:false },
-      { label:'¿Cómo lo reescribirías para producción?', placeholder:'Incluye checkpoint, esquema y consideraciones de idempotencia en Databricks.', rows:5, mono:false },
+      { label:'¿Dónde está el bug y por qué?', placeholder:'Explica qué devuelve realmente la función y en qué caso falla.', rows:5, mono:false },
+      { label:'¿Cómo lo corregirías?', placeholder:'Escribe la corrección o explícala con palabras.', rows:4, mono:false },
     ]
   },
   {
-    id:'p4', level:'Mid', title:'Upsert a Silver con Delta MERGE',
-    prompt:'Explica qué hace este código en Databricks y comenta riesgos de rendimiento/consistencia.',
-    code:`from delta.tables import DeltaTable
+    id:'p3', level:'Mid', title:'¿Qué problema tiene este pipeline?',
+    prompt:'Este código funciona con datos de prueba pero falla en producción con ficheros grandes. ¿Por qué? ¿Cómo lo arreglarías?',
+    code:`import pandas as pd
 
-def upsert_silver(df_updates, tabla_silver: str):
-    delta_target = DeltaTable.forName(spark, tabla_silver)
+def procesar_pedidos(ruta: str) -> pd.DataFrame:
 
-    (delta_target.alias('t')
-      .merge(df_updates.alias('s'), 't.cliente_id = s.cliente_id')
-      .whenMatchedUpdateAll()
-      .whenNotMatchedInsertAll()
-      .execute())
+    df = pd.read_csv(ruta)
 
-    spark.sql(f"OPTIMIZE {tabla_silver}")`,
+    resultado = pd.DataFrame()
+    for _, fila in df.iterrows():
+        enriquecida = pd.DataFrame([{
+            'pedido_id': fila['pedido_id'],
+            'cliente':   fila['cliente_id'],
+            'importe':   fila['cantidad'] * fila['precio_unitario'],
+            'iva':       fila['cantidad'] * fila['precio_unitario'] * 0.21,
+        }])
+        resultado = pd.concat([resultado, enriquecida])
+
+    return resultado.reset_index(drop=True)`,
     answers:[
-      { label:'¿Qué hace? Explica cada bloque', placeholder:'Describe el comportamiento del MERGE y cuándo actualiza o inserta.', rows:5, mono:false },
-      { label:'¿Detectas riesgos o mejoras?', placeholder:'Comenta claves de merge, particionado, OPTIMIZE/ZORDER y coste de ejecución.', rows:5, mono:false },
+      { label:'¿Por qué falla con ficheros grandes?', placeholder:'Identifica los problemas de rendimiento. ¿Qué ocurre en memoria con cada iteración?', rows:5, mono:false },
+      { label:'¿Cómo lo reescribirías?', placeholder:'No hace falta código exacto. Explica cómo lo harías de forma eficiente.', rows:5, mono:false },
+    ]
+  },
+  {
+    id:'p4', level:'Mid', title:'Transformación con PySpark',
+    prompt:'Explica qué hace este código. ¿Hay algo que te llame la atención en términos de rendimiento?',
+    code:`from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+def ventas_por_cliente(ruta_entrada: str, ruta_salida: str) -> None:
+
+    spark = SparkSession.builder \\
+        .appName("ventas_por_cliente") \\
+        .getOrCreate()
+
+    df = spark.read.parquet(ruta_entrada)
+
+    df = df.filter(F.col('estado') != 'cancelado')
+
+    resultado = df.groupBy('cliente_id').agg(
+        F.sum(F.col('cantidad') * F.col('precio_unitario')).alias('importe_total'),
+        F.count('pedido_id').alias('num_pedidos'),
+    )
+
+    resultado \\
+        .orderBy(F.col('importe_total').desc()) \\
+        .write \\
+        .mode('overwrite') \\
+        .parquet(ruta_salida)
+
+    spark.stop()`,
+    answers:[
+      { label:'¿Qué hace? Explica cada bloque', placeholder:'Explica qué hace cada parte del código.', rows:5, mono:false },
+      { label:'¿Detectas algún problema de rendimiento?', placeholder:'¿Hay alguna operación que podría ser costosa con millones de filas?', rows:5, mono:false },
     ]
   },
 ];
